@@ -1,13 +1,17 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Catalog",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#5CFFD5",
+    "light": "#5CFFD5",
+    "dark": "#054C3A"
   },
   "favicon": "/favicon.svg",
+  "appearance": {
+    "default": "dark",
+    "strict": true
+  },
   "navigation": {
     "tabs": [
       {
@@ -76,27 +80,21 @@
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/logo.svg",
+    "dark": "/logo/logo.svg"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
+    "links": [],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
+      "label": "Explorer",
       "href": "https://dashboard.mintlify.com"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/catalogfi",
+      "github": "https://github.com/catalogfi"
     }
   }
 }
