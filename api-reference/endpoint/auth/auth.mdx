@@ -1,0 +1,538 @@
+---
+title: "Authentication"
+description: "Learn how to implement secure authentication and wallet management using Catalog API's social login system and OTP authentication."
+---
+
+# Authentication Endpoints
+
+Catalog API provides a comprehensive authentication system that combines social logins with passwordless OTP authentication. When users authenticate, we automatically create and manage their blockchain wallets, making it easy for them to interact with Web3 without understanding the underlying complexity.
+
+## Quick Start - Authentication Flow
+
+<Steps>
+  <Step title="Send OTP">Send a 6-digit code to user's email</Step>
+  <Step title="Verify OTP">User enters the code to authenticate</Step>
+  <Step title="Get Tokens">Receive access and refresh tokens</Step>
+  <Step title="Use API">Make authenticated requests with tokens</Step>
+</Steps>
+
+## Authentication Methods
+
+### Email OTP Authentication
+
+For users who prefer email-based authentication, we provide a secure passwordless system.
+
+## Send OTP
+
+Initiates the passwordless authentication process by sending a 6-digit OTP code to the user's email address.
+
+<RequestExample>
+  <RequestExampleMethod>POST</RequestExampleMethod>
+  <RequestExampleUrl>/v1/auth/otp/send</RequestExampleUrl>
+  <RequestExampleBody>
+```json
+{
+  "email": "user@example.com"
+}
+```
+  </RequestExampleBody>
+</RequestExample>
+
+### Request Parameters
+
+| Parameter | Type   | Required | Description          |
+| --------- | ------ | -------- | -------------------- |
+| `email`   | string | Yes      | User's email address |
+
+### Response
+
+<ResponseExample>
+  <ResponseExampleStatus>200</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "success": true
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+### Error Responses
+
+<ResponseExample>
+  <ResponseExampleStatus>400</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "Invalid email"
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+<ResponseExample>
+  <ResponseExampleStatus>429</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "Too many OTP requests. Please try again later.",
+  "retry_after": 60,
+  "rate_limit_reset": "2025-01-14T12:00:00Z"
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+<Note>
+  Rate limiting applies to OTP requests to prevent abuse. Check the
+  `retry_after` field to know when you can request another OTP.
+</Note>
+
+## Verify OTP
+
+Authenticates the user by verifying the 6-digit OTP code sent to their email address. Upon successful authentication, we automatically create and manage their blockchain wallet.
+
+<RequestExample>
+  <RequestExampleMethod>POST</RequestExampleMethod>
+  <RequestExampleUrl>/v1/auth/otp/verify</RequestExampleUrl>
+  <RequestExampleBody>
+```json
+{
+  "email": "user@example.com",
+  "code": "123456",
+  "mode": "login-or-sign-up"
+}
+```
+  </RequestExampleBody>
+</RequestExample>
+
+### Request Parameters
+
+| Parameter | Type   | Required | Description                                                      |
+| --------- | ------ | -------- | ---------------------------------------------------------------- |
+| `email`   | string | Yes      | User's email address                                             |
+| `code`    | string | Yes      | 6-digit OTP code                                                 |
+| `mode`    | string | Yes      | Authentication mode (currently only supports "login-or-sign-up") |
+
+### Response
+
+<ResponseExample>
+  <ResponseExampleStatus>200</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "user": {
+    "id": "did:catalog:cmcvh61po02lul70mgjj4q21",
+    "created_at": 1752036285,
+    "linked_accounts": [
+      {
+        "type": "email",
+        "address": "user@example.com",
+        "verified_at": 1752036285,
+        "first_verified_at": 1752036285,
+        "latest_verified_at": 1753333327
+      }
+    ],
+    "mfa_methods": [],
+    "has_accepted_terms": true,
+    "is_guest": false
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "catalog_access_token": "cat_abc123...",
+  "refresh_token": "ncqbUutBJFEjL--XkzdvaYeF6f-LCSr-Wm9toyj3AhoaEOwGKQl2qMPJzItQWMA_ZXsOesAjSdYp49YvjcVPWg",
+  "session_update_action": "set",
+  "is_new_user": false
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+### Response Fields
+
+| Field                     | Type    | Description                             |
+| ------------------------- | ------- | --------------------------------------- |
+| `user`                    | object  | User profile information                |
+| `user.id`                 | string  | Unique user identifier                  |
+| `user.created_at`         | integer | Unix timestamp of user creation         |
+| `user.linked_accounts`    | array   | User's linked authentication methods    |
+| `user.has_accepted_terms` | boolean | Whether user has accepted terms         |
+| `user.is_guest`           | boolean | Whether user is a guest account         |
+| `token`                   | string  | JWT access token for API authentication |
+| `catalog_access_token`    | string  | Catalog-specific access token           |
+| `refresh_token`           | string  | Token for refreshing the session        |
+| `session_update_action`   | string  | Session update instruction              |
+| `is_new_user`             | boolean | Whether this is a new user registration |
+
+<Note>
+  Upon successful authentication, we automatically create and manage the user's
+  blockchain wallet. The user can now execute transactions through our wallet
+  management endpoints.
+</Note>
+
+### Error Responses
+
+<ResponseExample>
+  <ResponseExampleStatus>400</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "Code is expired",
+  "code": "invalid_data"
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+<ResponseExample>
+  <ResponseExampleStatus>401</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "Invalid OTP code"
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+<ResponseExample>
+  <ResponseExampleStatus>429</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "Too many authentication attempts. Please try again later.",
+  "retry_after": 60
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+## Refresh Session
+
+Refreshes the user's session using a refresh token, providing new access tokens without requiring re-authentication. This maintains the user's wallet access and session state.
+
+<RequestExample>
+  <RequestExampleMethod>POST</RequestExampleMethod>
+  <RequestExampleUrl>/v1/auth/sessions</RequestExampleUrl>
+  <RequestExampleBody>
+```json
+{
+  "refresh_token": "ncqbUutBJFEjL--XkzdvaYeF6f-LCSr-Wm9toyj3AhoaEOwGKQl2qMPJzItQWMA_ZXsOesAjSdYp49YvjcVPWg"
+}
+```
+  </RequestExampleBody>
+</RequestExample>
+
+### Request Parameters
+
+| Parameter       | Type   | Required | Description                                |
+| --------------- | ------ | -------- | ------------------------------------------ |
+| `refresh_token` | string | Yes      | Refresh token from previous authentication |
+
+### Response
+
+<ResponseExample>
+  <ResponseExampleStatus>200</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "user": {
+    "id": "did:catalog:cmcvh61po02lul70mgjj4q21",
+    "created_at": 1752036285,
+    "linked_accounts": [
+      {
+        "type": "email",
+        "address": "user@example.com",
+        "verified_at": 1752036285,
+        "first_verified_at": 1752036285,
+        "latest_verified_at": 1753421515
+      }
+    ],
+    "mfa_methods": [],
+    "has_accepted_terms": true,
+    "is_guest": false
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "catalog_access_token": "cat_xyz789...",
+  "refresh_token": "new_refresh_token_here...",
+  "session_update_action": "ignore"
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+### Error Responses
+
+<ResponseExample>
+  <ResponseExampleStatus>400</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "Invalid refresh token"
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+<ResponseExample>
+  <ResponseExampleStatus>401</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "Refresh token expired"
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+<ResponseExample>
+  <ResponseExampleStatus>429</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "Too many session refresh attempts. Please try again later.",
+  "retry_after": 60
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+## Social Login Authentication
+
+Users can also authenticate using their existing social accounts. The flow is similar but uses OAuth tokens instead of OTP codes.
+
+### Supported Social Platforms
+
+- **Google OAuth**
+- **Twitter OAuth**
+- **Discord OAuth**
+- **GitHub OAuth**
+- **Apple OAuth**
+- **And many more...**
+
+### Social Login Verify
+
+Authenticates the user using their social account OAuth token.
+
+<RequestExample>
+  <RequestExampleMethod>POST</RequestExampleMethod>
+  <RequestExampleUrl>/v1/auth/social/verify</RequestExampleUrl>
+  <RequestExampleBody>
+```json
+{
+  "provider": "google",
+  "access_token": "google_oauth_token_here"
+}
+```
+  </RequestExampleBody>
+</RequestExample>
+
+### Request Parameters
+
+| Parameter      | Type   | Required | Description                                      |
+| -------------- | ------ | -------- | ------------------------------------------------ |
+| `provider`     | string | Yes      | Social provider (google, twitter, discord, etc.) |
+| `access_token` | string | Yes      | OAuth access token from the social provider      |
+
+### Response
+
+<ResponseExample>
+  <ResponseExampleStatus>200</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "user": {
+    "id": "did:catalog:cmcvh61po02lul70mgjj4q21",
+    "created_at": 1752036285,
+    "linked_accounts": [
+      {
+        "type": "google",
+        "address": "user@gmail.com",
+        "verified_at": 1752036285,
+        "first_verified_at": 1752036285,
+        "latest_verified_at": 1753333327
+      }
+    ],
+    "mfa_methods": [],
+    "has_accepted_terms": true,
+    "is_guest": false
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "catalog_access_token": "cat_abc123...",
+  "refresh_token": "ncqbUutBJFEjL--XkzdvaYeF6f-LCSr-Wm9toyj3AhoaEOwGKQl2qMPJzItQWMA_ZXsOesAjSdYp49YvjcVPWg",
+  "session_update_action": "set",
+  "is_new_user": false
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+### Error Responses
+
+<ResponseExample>
+  <ResponseExampleStatus>400</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "Invalid OAuth token"
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+<ResponseExample>
+  <ResponseExampleStatus>401</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "OAuth token expired"
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+## Using Authentication Tokens
+
+Once you have the access token, use it in the `Authorization` header for all subsequent API requests.
+
+### Example: Get User Wallets
+
+<RequestExample>
+  <RequestExampleMethod>GET</RequestExampleMethod>
+  <RequestExampleUrl>/v1/wallets</RequestExampleUrl>
+  <RequestExampleHeaders>
+```json
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "Content-Type": "application/json"
+}
+```
+  </RequestExampleHeaders>
+</RequestExample>
+
+### Response
+
+<ResponseExample>
+  <ResponseExampleStatus>200</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "wallets": [
+    {
+      "id": "wallet_123",
+      "address": "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6",
+      "chain": "ethereum",
+      "balance": "0.1"
+    }
+  ]
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+### Error Responses
+
+<ResponseExample>
+  <ResponseExampleStatus>401</ResponseExampleStatus>
+  <ResponseExampleBody>
+```json
+{
+  "error": "Unauthorized"
+}
+```
+  </ResponseExampleBody>
+</ResponseExample>
+
+## Complete Authentication Flow Example
+
+Here's a complete example showing the full authentication flow:
+
+```javascript
+// Step 1: Send OTP
+const sendOTP = async (email) => {
+  const response = await fetch("https://api.catalog.fi/v1/auth/otp/send", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return response.json();
+};
+
+// Step 2: Verify OTP and get tokens
+const verifyOTP = async (email, code) => {
+  const response = await fetch("https://api.catalog.fi/v1/auth/otp/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email,
+      code,
+      mode: "login-or-sign-up",
+    }),
+  });
+  return response.json();
+};
+
+// Step 3: Use tokens for authenticated requests
+const getWallets = async (accessToken) => {
+  const response = await fetch("https://api.catalog.fi/v1/wallets", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.json();
+};
+
+// Usage example
+const authenticateUser = async (email) => {
+  // Send OTP
+  await sendOTP(email);
+
+  // User enters code (in real app, this would be user input)
+  const code = "123456";
+
+  // Verify OTP
+  const authResult = await verifyOTP(email, code);
+
+  // Store tokens securely
+  const { token, refresh_token } = authResult;
+
+  // Use token for API calls
+  const wallets = await getWallets(token);
+
+  return { authResult, wallets };
+};
+```
+
+## What Happens After Authentication?
+
+Once a user is authenticated, they gain access to:
+
+### Wallet Management
+
+- **Automatic Wallet Creation**: We create and manage their blockchain wallets
+- **Multi-Chain Support**: Support for Ethereum, Solana, and other blockchains
+- **Transaction Execution**: Users can execute transactions through our managed wallets
+
+### User Experience Benefits
+
+- **No Private Key Management**: Users don't need to understand or manage private keys
+- **Simplified Transactions**: Users just tell us what they want to do
+- **Gas Fee Handling**: We handle gas fees and transaction optimization
+- **Cross-Chain Support**: Seamless interaction across multiple blockchains
+
+## Best Practices
+
+### Security Considerations
+
+- **Store tokens securely**: Keep access tokens in memory and refresh tokens in secure storage
+- **Token expiration**: Access tokens have a limited lifespan; use refresh tokens to maintain sessions
+- **Rate limiting**: Respect rate limits to avoid being blocked
+- **Error handling**: Implement proper error handling for authentication failures
+
+### Implementation Tips
+
+- **OTP expiration**: OTP codes expire quickly; prompt users to enter them promptly
+- **Session management**: Implement automatic token refresh before expiration
+- **User experience**: Provide clear feedback for authentication steps
+- **Social login preference**: Consider offering both social and email authentication options

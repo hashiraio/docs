@@ -1,33 +1,116 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: "Introduction"
+description: "Welcome to the Catalog API documentation. Learn how to integrate secure wallet management and user authentication into your applications."
 ---
 
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  Be sure to obtain the Auth-Token first in order to call the protected
+  endpoints
 </Note>
 
-## Welcome
+## Welcome to Catalog API
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+Catalog API is a **Wallet as a Service (WaaS)** platform that provides secure, scalable wallet management for modern applications. We handle the complexity of blockchain interactions so you can focus on building great user experiences.
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+### What is Wallet as a Service?
 
-## Authentication
+With Catalog, users can sign up using their preferred social login (Google, Twitter, Discord, etc.) and we automatically create and manage their blockchain wallets. Users simply tell us what they want to do, and we execute transactions on their behalf - no need for them to understand private keys, gas fees, or blockchain complexity.
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+### Key Features
+
+- **Social Authentication**: Sign up with Google, Twitter, Discord, GitHub, and more
+- **Automatic Wallet Creation**: Wallets are created and managed automatically
+- **Transaction Execution**: Execute transactions on behalf of users
+- **Multi-Chain Support**: Support for Ethereum, Solana, and other blockchains
+- **Passwordless Authentication**: Email OTP-based login without passwords
+- **Session Management**: Secure token-based authentication with refresh capabilities
+- **User Management**: Comprehensive user account and wallet management
+- **App Configuration**: Flexible app settings and domain management
+
+### Base URL
+
+All API requests should be made to:
+
+```
+https://api.catalog.fi
+```
+
+### Authentication
+
+Most API endpoints require authentication using Bearer tokens. The authentication flow typically involves:
+
+1. **Social Login**: User authenticates with their preferred social platform
+2. **Wallet Creation**: We automatically create and manage their blockchain wallet
+3. **Token Generation**: User receives access tokens for API interactions
+4. **Session Management**: Use refresh tokens to maintain sessions
 
 ```json
 "security": [
   {
-    "bearerAuth": []
+    "BearerAuth": []
   }
 ]
 ```
+
+### Rate Limiting
+
+The API implements rate limiting to ensure fair usage:
+
+- **OTP Requests**: Limited to prevent abuse
+- **Authentication Attempts**: Rate limited for security
+- **Transaction Requests**: Limited to prevent excessive blockchain interactions
+- **Session Refresh**: Limited to prevent excessive requests
+
+When rate limited, responses include:
+
+- `retry_after`: Seconds to wait before retrying
+- `rate_limit_reset`: Timestamp when limits reset
+
+### Response Format
+
+All API responses follow a consistent JSON format:
+
+**Success Response:**
+
+```json
+{
+  "success": true,
+  "data": { ... }
+}
+```
+
+**Error Response:**
+
+```json
+{
+  "error": "Error message",
+  "code": "error_code"
+}
+```
+
+### HTTP Status Codes
+
+- `200` - Success
+- `400` - Bad Request
+- `401` - Unauthorized
+- `403` - Forbidden
+- `404` - Not Found
+- `429` - Too Many Requests
+
+<Card
+  title="OpenAPI Specification"
+  icon="code"
+  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
+>
+  View the complete OpenAPI specification file
+</Card>
+
+## Getting Started
+
+1. **Create an Account**: Sign up at [catalog.fi](https://privy.staging.jheb.com/)
+2. **Create an App**: Set up your application in the dashboard
+3. **Configure Authentication**: Choose your preferred social login methods
+4. **Integrate the API**: Use our endpoints to authenticate users and manage wallets
+5. **Execute Transactions**: Let users interact with blockchain through your app
+
+Ready to get started? Check out our [Authentication endpoints](/api-reference/endpoint/auth).

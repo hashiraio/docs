@@ -1,0 +1,71 @@
+---
+title: "Users Overview"
+description: "Comprehensive user management using Catalog API for user operations and data"
+---
+
+<Note>All user endpoints require authentication using Bearer tokens</Note>
+
+## Users Overview
+
+Catalog API provides comprehensive user management capabilities that allow you to create, retrieve, update, and delete users within your applications. The user management system is designed to work seamlessly with the authentication system and wallet management features.
+
+### Key Features
+
+- **User Creation**: Create new users with custom metadata
+- **User Retrieval**: Get users by ID, email, wallet address, or custom auth ID
+- **User Listing**: Retrieve all users with pagination and filtering
+- **User Deletion**: Remove users from your application
+- **Custom Metadata**: Store and update custom user data
+- **Wallet Pre-generation**: Pre-generate wallets for users
+
+### Authentication
+
+All user management endpoints require authentication using Bearer tokens. The token should be included in the Authorization header:
+
+```
+Authorization: Bearer <your-token>
+```
+
+### Base URL
+
+All user endpoints are available at:
+
+```
+https://api.catalog.fi/v1/users
+```
+
+### User Object Structure
+
+Users in Catalog API have the following structure:
+
+```json
+{
+  "id": "did:catalog:cmcvh61po02lul70mgjj4kq21",
+  "created_at": 1752036285,
+  "linked_accounts": [
+    {
+      "type": "email",
+      "address": "user@example.com",
+      "verified_at": 1752036285,
+      "first_verified_at": 1752036285,
+      "latest_verified_at": 1753333327
+    }
+  ],
+  "mfa_methods": [],
+  "has_accepted_terms": true,
+  "is_guest": false,
+  "custom_metadata": {
+    "custom_field": "custom_value"
+  }
+}
+```
+
+### Quick Start - User Management Flow
+
+1. **Create User** - Create a new user with basic information
+2. **Retrieve User** - Get user details by various identifiers
+3. **Update Metadata** - Add or update custom user data
+4. **Manage Wallets** - Pre-generate wallets for users
+5. **Delete User** - Remove users when needed
+
+Ready to get started? Check out our [Create User](/api-reference/endpoint/create-user) endpoint.
