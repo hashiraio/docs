@@ -1,0 +1,40 @@
+---
+title: "Update User Custom Metadata"
+openapi: "POST /v1/users/{userId}/custom-metadata"
+---
+
+This endpoint allows you to add custom metadata to a user. Custom metadata can be used to store additional information about users that's specific to your application.
+
+## Request
+
+The request requires the user ID in the path and custom metadata in the request body.
+
+## Response
+
+Returns a success response when the metadata is added successfully.
+
+## Example
+
+```bash
+curl -X POST https://api.catalog.fi/v1/users/{userId}/custom-metadata \
+  -H "Content-Type: application/json" \
+  -H "privy-app-id: YOUR_APP_ID" \
+  -d '{
+    "metadata": {
+      "preferences": {
+        "theme": "dark",
+        "notifications": true
+      },
+      "profile": {
+        "bio": "Software developer"
+      }
+    }
+  }'
+```
+
+## Use Cases
+
+- Storing user preferences
+- Application-specific user data
+- Integration with external systems
+- User profile customization
