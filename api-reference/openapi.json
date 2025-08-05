@@ -1946,13 +1946,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -2500,13 +2500,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -4129,7 +4129,339 @@
         ]
       }
     },
-    "/v1/apps/{appId}/wallets": {
+    "/v1/wallets/{walletId}": {
+      "get": {
+        "summary": "Get wallet",
+        "description": "Retrieves details of a specific wallet by ID",
+        "tags": ["Wallets"],
+        "security": [
+          {
+            "BasicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "walletId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Wallet ID",
+            "example": "d0l66us361cm2p5777kpihjx"
+          },
+          {
+            "name": "catalog-app-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Catalog App ID",
+            "example": "cla04x0d00002nyb6oofp5dqh"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Wallet details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique wallet identifier",
+                      "example": "d0l66us361cm2p5777kpihjx"
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "Type of wallet",
+                      "example": "server"
+                    },
+                    "address": {
+                      "type": "string",
+                      "description": "Wallet address on the blockchain",
+                      "example": "0x226d2AeCE1a29d84FD133aEAa1584BaE853CF02D"
+                    },
+                    "chain_type": {
+                      "type": "string",
+                      "enum": ["ethereum", "solana"],
+                      "description": "Type of blockchain for the wallet",
+                      "example": "ethereum"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "description": "Timestamp when the wallet was created",
+                      "example": 1753766031400
+                    },
+                    "delegated": {
+                      "type": "boolean",
+                      "description": "Whether the wallet is delegated",
+                      "example": false
+                    },
+                    "auth_key": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Authentication key information"
+                    },
+                    "policy": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Policy information applied to the wallet"
+                    },
+                    "signers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "Array of signers associated with the wallet"
+                    },
+                    "user_id": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "User ID associated with the wallet"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Tags associated with the wallet"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Wallet not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Wallet not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.privy.io"
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Update wallet",
+        "description": "Updates a specific wallet's configuration and properties",
+        "tags": ["Wallets"],
+        "security": [
+          {
+            "BasicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "walletId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Wallet ID",
+            "example": "d0l66us361cm2p5777kpihjx"
+          },
+          {
+            "name": "catalog-app-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Catalog App ID",
+            "example": "cla04x0d00002nyb6oofp5dqh"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Tags to associate with the wallet",
+                    "example": ["production", "user-wallet"]
+                  },
+                  "policy_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Policy IDs to apply to the wallet",
+                    "example": ["sb02ad6ed2kah6l32gz1n40e"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Wallet updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique wallet identifier",
+                      "example": "d0l66us361cm2p5777kpihjx"
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "Type of wallet",
+                      "example": "server"
+                    },
+                    "address": {
+                      "type": "string",
+                      "description": "Wallet address on the blockchain",
+                      "example": "0x226d2AeCE1a29d84FD133aEAa1584BaE853CF02D"
+                    },
+                    "chain_type": {
+                      "type": "string",
+                      "enum": ["ethereum", "solana"],
+                      "description": "Type of blockchain for the wallet",
+                      "example": "ethereum"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "description": "Timestamp when the wallet was created",
+                      "example": 1753766031400
+                    },
+                    "delegated": {
+                      "type": "boolean",
+                      "description": "Whether the wallet is delegated",
+                      "example": false
+                    },
+                    "auth_key": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Authentication key information"
+                    },
+                    "policy": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Policy information applied to the wallet"
+                    },
+                    "signers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "Array of signers associated with the wallet"
+                    },
+                    "user_id": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "User ID associated with the wallet"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Tags associated with the wallet"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid wallet configuration"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Wallet not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Wallet not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "https://api.privy.io"
+          }
+        ]
+      }
+    },
+    "/v1/wallets": {
       "post": {
         "summary": "Create wallet",
         "description": "Creates a new wallet for the specified app. Supports both Ethereum and Solana chains with optional policy, owner, and additional signers configuration.",
@@ -4437,341 +4769,7 @@
             "url": "https://api.catalog.fi"
           }
         ]
-      }
-    },
-    "/v1/wallets/{walletId}": {
-      "get": {
-        "summary": "Get wallet",
-        "description": "Retrieves details of a specific wallet by ID",
-        "tags": ["Wallets"],
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "walletId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Wallet ID",
-            "example": "d0l66us361cm2p5777kpihjx"
-          },
-          {
-            "name": "privy-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Privy App ID",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Wallet details retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "Unique wallet identifier",
-                      "example": "d0l66us361cm2p5777kpihjx"
-                    },
-                    "type": {
-                      "type": "string",
-                      "description": "Type of wallet",
-                      "example": "server"
-                    },
-                    "address": {
-                      "type": "string",
-                      "description": "Wallet address on the blockchain",
-                      "example": "0x226d2AeCE1a29d84FD133aEAa1584BaE853CF02D"
-                    },
-                    "chain_type": {
-                      "type": "string",
-                      "enum": ["ethereum", "solana"],
-                      "description": "Type of blockchain for the wallet",
-                      "example": "ethereum"
-                    },
-                    "created_at": {
-                      "type": "integer",
-                      "description": "Timestamp when the wallet was created",
-                      "example": 1753766031400
-                    },
-                    "delegated": {
-                      "type": "boolean",
-                      "description": "Whether the wallet is delegated",
-                      "example": false
-                    },
-                    "auth_key": {
-                      "type": "object",
-                      "nullable": true,
-                      "description": "Authentication key information"
-                    },
-                    "policy": {
-                      "type": "object",
-                      "nullable": true,
-                      "description": "Policy information applied to the wallet"
-                    },
-                    "signers": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      },
-                      "description": "Array of signers associated with the wallet"
-                    },
-                    "user_id": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "User ID associated with the wallet"
-                    },
-                    "tags": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "description": "Tags associated with the wallet"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Wallet not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Wallet not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "servers": [
-          {
-            "url": "https://api.privy.io"
-          }
-        ]
       },
-      "patch": {
-        "summary": "Update wallet",
-        "description": "Updates a specific wallet's configuration and properties",
-        "tags": ["Wallets"],
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "walletId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Wallet ID",
-            "example": "d0l66us361cm2p5777kpihjx"
-          },
-          {
-            "name": "privy-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Privy App ID",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "tags": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "Tags to associate with the wallet",
-                    "example": ["production", "user-wallet"]
-                  },
-                  "policy_ids": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "description": "Policy IDs to apply to the wallet",
-                    "example": ["sb02ad6ed2kah6l32gz1n40e"]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Wallet updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "Unique wallet identifier",
-                      "example": "d0l66us361cm2p5777kpihjx"
-                    },
-                    "type": {
-                      "type": "string",
-                      "description": "Type of wallet",
-                      "example": "server"
-                    },
-                    "address": {
-                      "type": "string",
-                      "description": "Wallet address on the blockchain",
-                      "example": "0x226d2AeCE1a29d84FD133aEAa1584BaE853CF02D"
-                    },
-                    "chain_type": {
-                      "type": "string",
-                      "enum": ["ethereum", "solana"],
-                      "description": "Type of blockchain for the wallet",
-                      "example": "ethereum"
-                    },
-                    "created_at": {
-                      "type": "integer",
-                      "description": "Timestamp when the wallet was created",
-                      "example": 1753766031400
-                    },
-                    "delegated": {
-                      "type": "boolean",
-                      "description": "Whether the wallet is delegated",
-                      "example": false
-                    },
-                    "auth_key": {
-                      "type": "object",
-                      "nullable": true,
-                      "description": "Authentication key information"
-                    },
-                    "policy": {
-                      "type": "object",
-                      "nullable": true,
-                      "description": "Policy information applied to the wallet"
-                    },
-                    "signers": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      },
-                      "description": "Array of signers associated with the wallet"
-                    },
-                    "user_id": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "User ID associated with the wallet"
-                    },
-                    "tags": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
-                      "description": "Tags associated with the wallet"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Invalid wallet configuration"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Wallet not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Wallet not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "servers": [
-          {
-            "url": "https://api.privy.io"
-          }
-        ]
-      }
-    },
-    "/v1/wallets": {
       "get": {
         "summary": "Get wallets",
         "description": "Retrieves a list of wallets for the app with optional filtering",
@@ -4783,13 +4781,13 @@
         ],
         "parameters": [
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -4974,13 +4972,13 @@
             "example": "d0l66us361cm2p5777kpihjx"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -5114,13 +5112,13 @@
             "example": "d0l66us361cm2p5777kpihjx"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -5234,13 +5232,13 @@
             "example": "d0l66us361cm2p5777kpihjx"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -5415,8 +5413,8 @@
     },
     "/v1/wallets/{walletId}/rpc": {
       "post": {
-        "summary": "Wallet RPC operations",
-        "description": "Performs RPC operations on a wallet including message signing and transaction sending. Supports Ethereum methods (personal_sign, eth_sendTransaction, eth_signTransaction, eth_signTypedData_v4, eth_sign7702Authorization, secp256k1_sign), Solana methods (signMessage, signTransaction, signAndSendTransaction), and cross-chain raw signing (raw_sign).",
+        "summary": "Wallet Actions",
+        "description": "Performs RPC calls on a wallet.",
         "tags": ["Wallets"],
         "security": [
           {
@@ -5435,13 +5433,13 @@
             "example": "d0l66us361cm2p5777kpihjx"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -6305,7 +6303,7 @@
         ]
       }
     },
-    "/v1/apps/{appId}/quorums": {
+    "/v1/quorums": {
       "get": {
         "summary": "Get key quorums",
         "description": "Retrieves all key quorums for a specific app",
@@ -6327,13 +6325,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -6474,13 +6472,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -6651,7 +6649,7 @@
         ]
       }
     },
-    "/v1/apps/{appId}/quorums/{keyQuorumId}": {
+    "/v1/quorums/{quorumId}": {
       "get": {
         "summary": "Get key quorum",
         "description": "Retrieves details of a specific key quorum",
@@ -6673,7 +6671,7 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "keyQuorumId",
+            "name": "quorumId",
             "in": "path",
             "required": true,
             "schema": {
@@ -6683,13 +6681,13 @@
             "example": "qsz36nck6u0z28lluuqkin98"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -6806,7 +6804,7 @@
           }
         ]
       },
-      "patch": {
+      "put": {
         "summary": "Update key quorum",
         "description": "Updates a specific key quorum's configuration",
         "tags": ["Key Quorums"],
@@ -6827,7 +6825,7 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "keyQuorumId",
+            "name": "quorumId",
             "in": "path",
             "required": true,
             "schema": {
@@ -6837,13 +6835,13 @@
             "example": "qsz36nck6u0z28lluuqkin98"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -7029,7 +7027,7 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "keyQuorumId",
+            "name": "quorumId",
             "in": "path",
             "required": true,
             "schema": {
@@ -7039,13 +7037,13 @@
             "example": "qsz36nck6u0z28lluuqkin98"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -7118,13 +7116,13 @@
         ],
         "parameters": [
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -7410,13 +7408,13 @@
             "example": "tb54eps4z44ed0jepousxi4n"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -7577,13 +7575,13 @@
             "example": "tb54eps4z44ed0jepousxi4n"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -7871,13 +7869,13 @@
             "example": "tb54eps4z44ed0jepousxi4n"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -7972,13 +7970,13 @@
             "example": "tb54eps4z44ed0jepousxi4n"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -8216,13 +8214,13 @@
             "example": "rule_abc123def456"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -8364,13 +8362,13 @@
             "example": "rule_abc123def456"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -8605,13 +8603,13 @@
             "example": "rule_abc123def456"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -8704,13 +8702,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -8805,13 +8803,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -8949,13 +8947,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -9059,13 +9057,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -9191,13 +9189,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -9335,13 +9333,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -9445,13 +9443,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -9578,13 +9576,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -9766,13 +9764,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -9881,13 +9879,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -10048,13 +10046,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -10197,13 +10195,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -10374,13 +10372,13 @@
             "example": "google"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -10505,13 +10503,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -10713,13 +10711,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "Privy App ID",
+            "description": "Catalog App ID",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -10920,13 +10918,13 @@
         ],
         "parameters": [
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -11097,14 +11095,41 @@
         ],
         "parameters": [
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
+          },
+          {
+            "name": "wallet",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User's wallet address",
+            "example": "0xE6bFb4137F3A8C069F98cc775f324A84FE45FdFF"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User's email address",
+            "example": "user@example.com"
+          },
+          {
+            "name": "auth-id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "User's custom authentication ID",
+            "example": "custom_user_123"
           },
           {
             "name": "limit",
@@ -11217,13 +11242,13 @@
             "example": "did:privy:cm3np4u9j001rc8b73seqmqqk"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -11361,13 +11386,13 @@
             "example": "did:privy:cm3np4u9j001rc8b73seqmqqk"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -11428,338 +11453,10 @@
         ]
       }
     },
-    "/v1/users/get-by-custom-auth": {
-      "post": {
-        "summary": "Get user by custom auth ID",
-        "description": "Get a user by custom authentication ID",
-        "tags": ["Users"],
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "privy-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "ID of your Privy app",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "custom_auth_id": {
-                    "type": "string",
-                    "description": "Custom authentication ID",
-                    "example": "custom_user_123"
-                  }
-                },
-                "required": ["custom_auth_id"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "User data",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "User ID",
-                      "example": "did:privy:cm3np4u9j001rc8b73seqmqqk"
-                    },
-                    "created_at": {
-                      "type": "integer",
-                      "description": "Timestamp when user was created",
-                      "example": 1731974895
-                    },
-                    "linked_accounts": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "User not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "User not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "servers": [
-          {
-            "url": "https://api.privy.io"
-          }
-        ]
-      }
-    },
-    "/v1/users/get-by-email": {
-      "post": {
-        "summary": "Get user by email address",
-        "description": "Get a user by email address",
-        "tags": ["Users"],
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "privy-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "ID of your Privy app",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "format": "email",
-                    "description": "Email address",
-                    "example": "user@example.com"
-                  }
-                },
-                "required": ["email"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "User data",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "User ID",
-                      "example": "did:privy:cm3np4u9j001rc8b73seqmqqk"
-                    },
-                    "created_at": {
-                      "type": "integer",
-                      "description": "Timestamp when user was created",
-                      "example": 1731974895
-                    },
-                    "linked_accounts": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "User not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "User not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "servers": [
-          {
-            "url": "https://api.privy.io"
-          }
-        ]
-      }
-    },
-    "/v1/users/get-by-wallet": {
-      "post": {
-        "summary": "Get user by wallet address",
-        "description": "Get a user by wallet address",
-        "tags": ["Users"],
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "privy-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "ID of your Privy app",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "wallet_address": {
-                    "type": "string",
-                    "description": "Wallet address",
-                    "example": "0xE6bFb4137F3A8C069F98cc775f324A84FE45FdFF"
-                  }
-                },
-                "required": ["wallet_address"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "User data",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "User ID",
-                      "example": "did:privy:cm3np4u9j001rc8b73seqmqqk"
-                    },
-                    "created_at": {
-                      "type": "integer",
-                      "description": "Timestamp when user was created",
-                      "example": 1731974895
-                    },
-                    "linked_accounts": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "User not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "User not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "servers": [
-          {
-            "url": "https://api.privy.io"
-          }
-        ]
-      }
-    },
-    "/v1/users/{userId}/custom-metadata": {
-      "post": {
-        "summary": "Add custom metadata",
-        "description": "Add custom metadata to a user",
+    "/v1/users/{userId}/metadata": {
+      "put": {
+        "summary": "Add metadata",
+        "description": "Add metadata to a user",
         "tags": ["Users"],
         "security": [
           {
@@ -11778,13 +11475,13 @@
             "example": "did:privy:cm3np4u9j001rc8b73seqmqqk"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -11887,7 +11584,7 @@
         ]
       }
     },
-    "/v1/users/{userId}/pregenerate-wallets": {
+    "/v1/users/{userId}/wallets/pregenerate": {
       "post": {
         "summary": "Pregenerate wallets",
         "description": "Pregenerate embedded wallets for a user",
@@ -11909,13 +11606,13 @@
             "example": "did:privy:cm3np4u9j001rc8b73seqmqqk"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           }
         ],
@@ -12063,13 +11760,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -12557,13 +12254,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
@@ -13048,13 +12745,13 @@
             "example": "cmcx1p0y50315i80ldhmlcnmm"
           },
           {
-            "name": "privy-app-id",
+            "name": "catalog-app-id",
             "in": "header",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "ID of your Privy app",
+            "description": "ID of your Catalog app",
             "example": "cla04x0d00002nyb6oofp5dqh"
           },
           {
