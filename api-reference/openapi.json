@@ -1050,7 +1050,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalogfi.com"
+            "url": "https://api.catalog.fi.com"
           }
         ]
       }
@@ -1402,7 +1402,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalogfi.com"
+            "url": "https://api.catalog.fi.com"
           }
         ]
       }
@@ -1414,7 +1414,7 @@
         "tags": ["Wallets"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -1426,17 +1426,7 @@
               "type": "string"
             },
             "description": "Wallet ID",
-            "example": "d0l66us361cm2p5777kpihjx"
-          },
-          {
-            "name": "catalog-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Catalog App ID",
-            "example": "cla04x0d00002nyb6oofp5dqh"
+            "example": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c"
           }
         ],
         "responses": {
@@ -1485,138 +1475,19 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
-          }
-        ]
-      },
-      "patch": {
-        "summary": "Update wallet",
-        "description": "Updates a specific wallet's configuration and properties",
-        "tags": ["Wallets"],
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "walletId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Wallet ID",
-            "example": "d0l66us361cm2p5777kpihjx"
-          },
-          {
-            "name": "catalog-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Catalog App ID",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateWalletRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Wallet updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Wallet"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Invalid wallet configuration"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Wallet not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Wallet not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "servers": [
-          {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
     },
     "/v1/wallets": {
       "post": {
-        "summary": "Create wallet",
-        "description": "Creates a new wallet for the specified app. Supports both Ethereum and Solana chains with optional policy, owner, and additional signers configuration.",
+        "summary": "Create wallets",
+        "description": "Creates the wallets across all 5 chains (Bitcoin, EVM, Solana, Starknet and Sui) for the provided user under the app",
         "tags": ["Wallets"],
         "security": [
           {
             "BearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "appId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "App ID",
-            "example": "cmcx1p0y50315i80ldhmlcnmm"
           }
         ],
         "requestBody": {
@@ -1635,23 +1506,33 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Wallet"
+                  "$ref": "#/components/schemas/Wallets"
                 }
               }
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request - Invalid input parameters or validation errors",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletValidationErrorResponse"
+                    }
+                  ]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized",
+            "description": "Unauthorized - Invalid or missing authentication token",
             "content": {
               "application/json": {
                 "schema": {
@@ -1661,7 +1542,7 @@
             }
           },
           "403": {
-            "description": "Forbidden",
+            "description": "Forbidden - Insufficient permissions",
             "content": {
               "application/json": {
                 "schema": {
@@ -1671,21 +1552,35 @@
             }
           },
           "404": {
-            "description": "App not found",
+            "description": "Not Found - App or wallet not found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NotFoundResponse"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/NotFoundResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletErrorResponse"
+                    }
+                  ]
                 }
               }
             }
           },
-          "429": {
-            "description": "Too Many Requests",
+          "500": {
+            "description": "Internal Server Error - Wallet creation or loading failed",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateWalletRateLimitResponse"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WalletCreationErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletLoadErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -1698,7 +1593,7 @@
         ]
       },
       "get": {
-        "summary": "Get wallets",
+        "summary": "Get all wallets",
         "description": "Retrieves a list of wallets for the app with optional filtering",
         "tags": ["Wallets"],
         "security": [
@@ -1708,58 +1603,34 @@
         ],
         "parameters": [
           {
-            "name": "catalog-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Catalog App ID",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          },
-          {
-            "name": "chain_type",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": ["ethereum", "solana"]
-            },
-            "description": "Filter wallets by chain type",
-            "example": "ethereum"
-          },
-          {
-            "name": "user_id",
+            "name": "account_id",
             "in": "query",
             "required": false,
             "schema": {
               "type": "string"
             },
-            "description": "Filter wallets by user ID",
-            "example": "dkqvwagss04y7sez0pa8yb74"
+            "description": "Filter wallets under a brand account",
+            "example": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c"
           },
           {
-            "name": "limit",
+            "name": "app_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 100,
-              "maximum": 1000
+              "type": "string"
             },
-            "description": "Maximum number of wallets to return",
-            "example": 50
+            "description": "Filter wallets under an application",
+            "example": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c"
           },
           {
-            "name": "offset",
+            "name": "owner_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "integer",
-              "default": 0
+              "type": "string"
             },
-            "description": "Number of wallets to skip",
-            "example": 0
+            "description": "Filter wallets under a user",
+            "example": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c"
           }
         ],
         "responses": {
@@ -1768,7 +1639,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WalletsResponse"
+                  "$ref": "#/components/schemas/Wallets"
                 }
               }
             }
@@ -1786,98 +1657,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
-          }
-        ]
-      }
-    },
-    "/v1/wallets/{walletId}/export": {
-      "post": {
-        "summary": "Export wallet",
-        "description": "Exports a wallet's private key and configuration for backup or migration purposes",
-        "tags": ["Wallets"],
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "walletId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Wallet ID",
-            "example": "d0l66us361cm2p5777kpihjx"
-          },
-          {
-            "name": "catalog-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Catalog App ID",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ExportWalletRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Wallet exported successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExportWalletResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Wallet not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WalletNotFoundResponse"
-                }
-              }
-            }
-          }
-        },
-        "servers": [
-          {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -1901,27 +1681,7 @@
               "type": "string"
             },
             "description": "Wallet ID",
-            "example": "d0l66us361cm2p5777kpihjx"
-          },
-          {
-            "name": "catalog-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Catalog App ID",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          },
-          {
-            "name": "caip2",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Chain identifier in CAIP-2 format",
-            "example": "eip155:1"
+            "example": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c"
           }
         ],
         "responses": {
@@ -1958,7 +1718,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -1983,60 +1743,6 @@
             },
             "description": "Wallet ID",
             "example": "d0l66us361cm2p5777kpihjx"
-          },
-          {
-            "name": "catalog-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Catalog App ID",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          },
-          {
-            "name": "caip2",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Chain identifier in CAIP-2 format",
-            "example": "eip155:1"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 50,
-              "maximum": 100
-            },
-            "description": "Maximum number of transactions to return",
-            "example": 25
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 0
-            },
-            "description": "Number of transactions to skip",
-            "example": 0
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": ["pending", "confirmed", "failed"]
-            },
-            "description": "Filter transactions by status",
-            "example": "confirmed"
           }
         ],
         "responses": {
@@ -2073,7 +1779,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -2098,26 +1804,6 @@
             },
             "description": "Wallet ID",
             "example": "d0l66us361cm2p5777kpihjx"
-          },
-          {
-            "name": "catalog-app-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Catalog App ID",
-            "example": "cla04x0d00002nyb6oofp5dqh"
-          },
-          {
-            "name": "privy-authorization-signature",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Request authorization signature. If multiple signatures are required, they should be comma separated.",
-            "example": "signature1,signature2"
           }
         ],
         "requestBody": {
@@ -2142,17 +1828,42 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request - Invalid input parameters or transaction failed",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletAmountErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletTokenIdErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletTransactionErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletInsufficientBalanceErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletInvalidAddressErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletUnsupportedChainErrorResponse"
+                    }
+                  ]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized",
+            "description": "Unauthorized - Invalid or missing authentication token",
             "content": {
               "application/json": {
                 "schema": {
@@ -2162,7 +1873,7 @@
             }
           },
           "403": {
-            "description": "Forbidden",
+            "description": "Forbidden - Insufficient permissions",
             "content": {
               "application/json": {
                 "schema": {
@@ -2176,7 +1887,24 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WalletNotFoundResponse"
+                  "$ref": "#/components/schemas/WalletErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Wallet loading or transaction save failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WalletLoadErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WalletSaveTransactionErrorResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -2194,7 +1922,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -2265,7 +1993,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -2354,7 +2082,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -2435,7 +2163,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -2534,7 +2262,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -2613,7 +2341,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -2694,7 +2422,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -2767,7 +2495,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -2868,7 +2596,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -2949,7 +2677,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -3052,7 +2780,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -3135,7 +2863,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -3246,7 +2974,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -3337,7 +3065,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -3423,7 +3151,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -3530,7 +3258,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -3638,7 +3366,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -3742,7 +3470,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -3849,7 +3577,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -3957,7 +3685,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -4050,7 +3778,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -4167,7 +3895,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -4260,7 +3988,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -4377,7 +4105,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -4470,7 +4198,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -4589,7 +4317,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -4704,7 +4432,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -4821,7 +4549,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -4927,7 +4655,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -5044,7 +4772,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -5127,7 +4855,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       },
@@ -5214,7 +4942,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -5345,7 +5073,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -5499,7 +5227,7 @@
         },
         "servers": [
           {
-            "url": "https://api.privy.io"
+            "url": "https://api.catalog.fi"
           }
         ]
       }
@@ -7103,6 +6831,7 @@
           }
         }
       },
+
       "Wallet": {
         "type": "object",
         "description": "Wallet object representing a blockchain wallet in the Catalog system",
@@ -7110,183 +6839,115 @@
           "id": {
             "type": "string",
             "description": "Unique wallet identifier",
-            "example": "d0l66us361cm2p5777kpihjx"
-          },
-          "type": {
-            "type": "string",
-            "description": "Type of wallet",
-            "example": "server"
+            "example": "76f3f233-9a99-486e-bab2-dc0518ba3dac"
           },
           "address": {
             "type": "string",
             "description": "Wallet address on the blockchain",
-            "example": "0x226d2AeCE1a29d84FD133aEAa1584BaE853CF02D"
+            "example": "tb1pvr68mmpfew4r48xrl8d4txkjmj73qejj8m7r49e5fpsrl8zpf5uqywmgrh"
           },
           "chain_type": {
             "type": "string",
-            "enum": ["ethereum", "solana"],
+            "enum": ["BITCOIN", "ETHEREUM", "SOLANA", "STARKNET", "SUI"],
             "description": "Type of blockchain for the wallet",
-            "example": "ethereum"
+            "example": "BITCOIN"
           },
-          "created_at": {
-            "type": "integer",
-            "description": "Timestamp when the wallet was created",
-            "example": 1753766031400
-          },
-          "delegated": {
-            "type": "boolean",
-            "description": "Whether the wallet is delegated",
-            "example": false
-          },
-          "auth_key": {
-            "type": "object",
-            "nullable": true,
-            "description": "Authentication key information",
-            "properties": {
-              "id": {
-                "type": "string",
-                "description": "Auth key ID",
-                "example": "dkqvwagss04y7sez0pa8yb74"
-              },
-              "display_name": {
-                "type": "string",
-                "description": "Display name for the auth key",
-                "example": "Hashira"
-              },
-              "authorization_threshold": {
-                "type": "integer",
-                "description": "Number of signatures required for authorization",
-                "example": 1
-              },
-              "authorization_keys": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "public_key": {
-                      "type": "string",
-                      "description": "Public key in PEM format",
-                      "example": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE62ypnPSHuR4NoOKRC0UU7zYZCKK2\nrTUtDeoNihExOdShmbO1elmvMoknM/HyIOqjIrm0hQZT3/9kUtof/VnDgg==\n-----END PUBLIC KEY-----"
-                    },
-                    "display_name": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "Display name for the authorization key"
-                    }
-                  }
-                }
-              },
-              "user_session_keys": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                },
-                "description": "User session keys"
-              }
-            }
-          },
-          "policy": {
-            "type": "object",
-            "nullable": true,
-            "description": "Policy information applied to the wallet",
-            "properties": {
-              "id": {
-                "type": "string",
-                "description": "Policy ID",
-                "example": "sb02ad6ed2kah6l32gz1n40e"
-              },
-              "name": {
-                "type": "string",
-                "description": "Policy name",
-                "example": "Test Policy"
-              }
-            }
-          },
-          "signers": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "description": "Signer ID",
-                  "example": "z73zi5i1m4fp57qfy6oc28cn"
-                },
-                "display_name": {
-                  "type": "string",
-                  "description": "Display name for the signer",
-                  "example": "Test key"
-                },
-                "key_quorum_id": {
-                  "type": "string",
-                  "description": "Key quorum ID",
-                  "example": "ohics7aordqs363e8b91g0lv"
-                }
-              }
-            },
-            "description": "Array of signers associated with the wallet"
-          },
-          "user_id": {
+          "app_id": {
             "type": "string",
-            "nullable": true,
-            "description": "User ID associated with the wallet"
+            "description": "App ID associated with the wallet",
+            "example": "4dba5ccb-5336-42d4-b43a-04b79a2192af"
           },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Tags associated with the wallet"
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "address",
-          "chain_type",
-          "created_at",
-          "delegated",
-          "signers",
-          "tags"
-        ]
-      },
-      "CreateWalletRequest": {
-        "type": "object",
-        "description": "Request body for creating a new wallet",
-        "properties": {
-          "chain_type": {
+          "owner_id": {
             "type": "string",
-            "enum": ["ethereum", "solana"],
-            "description": "Type of blockchain for the wallet",
-            "example": "ethereum"
+            "description": "Owner ID associated with the wallet",
+            "example": "188a45d3-0e92-403d-b377-d116ee59fddf"
           },
           "policy_ids": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "Array of policy IDs to apply to the wallet",
+            "description": "Array of policy IDs applied to the wallet",
             "example": []
           },
-          "owner_id": {
-            "type": "string",
-            "description": "ID of the wallet owner (optional)",
-            "example": "dkqvwagss04y7sez0pa8yb74"
+          "created_at": {
+            "type": "integer",
+            "description": "Timestamp when the wallet was created",
+            "example": 1757931209
+          }
+        },
+        "required": [
+          "id",
+          "address",
+          "chain_type",
+          "app_id",
+          "owner_id",
+          "policy_ids",
+          "created_at"
+        ]
+      },
+      "Wallets": {
+        "type": "array",
+        "description": "Array of wallet objects",
+        "items": {
+          "$ref": "#/components/schemas/Wallet"
+        },
+        "example": [
+          {
+            "id": "76f3f233-9a99-486e-bab2-dc0518ba3dac",
+            "address": "tb1pvr68mmpfew4r48xrl8d4txkjmj73qejj8m7r49e5fpsrl8zpf5uqywmgrh",
+            "chain_type": "BITCOIN",
+            "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+            "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+            "policy_ids": [],
+            "created_at": 1757931209
           },
-          "additional_signers": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "signer_id": {
-                  "type": "string",
-                  "description": "ID of the additional signer",
-                  "example": "ohics7aordqs363e8b91g0lv"
-                }
-              },
-              "required": ["signer_id"]
-            },
-            "description": "Array of additional signers for the wallet (optional)"
+          {
+            "id": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c",
+            "address": "0x3e17f24a1dddf32084520e165b426448741d4fb2",
+            "chain_type": "ETHEREUM",
+            "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+            "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+            "policy_ids": [],
+            "created_at": 1757931209
+          },
+          {
+            "id": "5e5049a0-a192-4153-adc7-1e039d6ed8e4",
+            "address": "3gpYs9qsugXnvikxRAWiqZMFifUPbxAVk7SbA543tB4y",
+            "chain_type": "SOLANA",
+            "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+            "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+            "policy_ids": [],
+            "created_at": 1757931209
+          },
+          {
+            "id": "e7d1067c-2641-484c-ab72-c3b134c7e21c",
+            "address": "0x287eab862f8fda704a760485da302dc0ee38fbb864969d37041aa9131337464",
+            "chain_type": "STARKNET",
+            "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+            "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+            "policy_ids": [],
+            "created_at": 1757931209
+          },
+          {
+            "id": "7676adbf-6b00-4f84-b143-67b18d644ac3",
+            "address": "0x756fce35d5b9ee5ad3df75c0c784c273bc6e1cd8c422ac07aec67b2daed1c201",
+            "chain_type": "SUI",
+            "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+            "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+            "policy_ids": [],
+            "created_at": 1757931209
+          }
+        ]
+      },
+      "CreateWalletRequest": {
+        "type": "object",
+        "description": "Request body for creating a new wallet",
+        "properties": {
+          "app_id": {
+            "type": "string",
+            "description": "Id of the application under which the wallets will be created",
+            "example": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c"
           }
         },
         "required": ["chain_type"]
@@ -8530,6 +8191,238 @@
           }
         }
       },
+      "WalletErrorResponse": {
+        "type": "object",
+        "description": "Standard wallet error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code",
+            "example": 400
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message",
+            "example": "Invalid Input: wallet_id - Invalid UUID format"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Error timestamp",
+            "example": "2024-01-01T00:00:00Z"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletValidationErrorResponse": {
+        "type": "object",
+        "description": "Wallet validation error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 400
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid request: At least one filter parameter out of account_id, app_id or owner_id is required"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletCreationErrorResponse": {
+        "type": "object",
+        "description": "Wallet creation error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 500
+          },
+          "message": {
+            "type": "string",
+            "example": "Failed to create wallet: [reason]"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletLoadErrorResponse": {
+        "type": "object",
+        "description": "Wallet loading error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 500
+          },
+          "message": {
+            "type": "string",
+            "example": "Failed to load wallet: [reason]"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletBalanceErrorResponse": {
+        "type": "object",
+        "description": "Wallet balance retrieval error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 500
+          },
+          "message": {
+            "type": "string",
+            "example": "Failed to get balance: [reason]"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletTransactionErrorResponse": {
+        "type": "object",
+        "description": "Wallet transaction error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 400
+          },
+          "message": {
+            "type": "string",
+            "example": "Transaction failed: [reason]"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletAmountErrorResponse": {
+        "type": "object",
+        "description": "Wallet amount validation error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 400
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid amount format: [amount]"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletTokenIdErrorResponse": {
+        "type": "object",
+        "description": "Wallet token ID required error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 400
+          },
+          "message": {
+            "type": "string",
+            "example": "Token ID required for Starknet transactions"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletSaveTransactionErrorResponse": {
+        "type": "object",
+        "description": "Wallet transaction save error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 500
+          },
+          "message": {
+            "type": "string",
+            "example": "Failed to save transaction: [reason]"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletInsufficientBalanceErrorResponse": {
+        "type": "object",
+        "description": "Wallet insufficient balance error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 400
+          },
+          "message": {
+            "type": "string",
+            "example": "Insufficient balance for transaction"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletInvalidAddressErrorResponse": {
+        "type": "object",
+        "description": "Wallet invalid address error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 400
+          },
+          "message": {
+            "type": "string",
+            "example": "Invalid wallet address: [address]"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
+      "WalletUnsupportedChainErrorResponse": {
+        "type": "object",
+        "description": "Wallet unsupported chain type error response",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 400
+          },
+          "message": {
+            "type": "string",
+            "example": "Unsupported chain type: [chain_type]"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["status", "message", "timestamp"]
+      },
       "CNAMERecord": {
         "type": "object",
         "description": "CNAME record configuration",
@@ -8552,7 +8445,7 @@
           "value": {
             "type": "string",
             "description": "DNS record value",
-            "example": "cmcx1p0y50315i80ldhmlcnmm.api.privy.systems"
+            "example": "cmcx1p0y50315i80ldhmlcnmm.api.catalog.fi.systems"
           }
         }
       },
@@ -8882,113 +8775,106 @@
         "type": "object",
         "description": "Response for wallet balance",
         "properties": {
+          "chain": {
+            "type": "string",
+            "description": "Chain type identifier",
+            "example": "STARKNET"
+          },
+          "chain_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Chain identifier (null for some chains)",
+            "example": null
+          },
+          "address": {
+            "type": "string",
+            "description": "Wallet address on the blockchain",
+            "example": "0x287eab862f8fda704a760485da302dc0ee38fbb864969d37041aa9131337464"
+          },
           "balance": {
             "type": "string",
-            "description": "Wallet balance in wei/smallest unit",
-            "example": "1000000000000000000"
+            "description": "Wallet balance in smallest unit",
+            "example": "7715666681861379520"
           },
-          "formatted_balance": {
+          "unit": {
             "type": "string",
-            "description": "Human-readable balance",
-            "example": "1.0"
+            "description": "Unit of the balance",
+            "example": "FELT"
           },
-          "currency": {
+          "unconfirmed_balance": {
             "type": "string",
-            "description": "Currency symbol",
-            "example": "ETH"
-          },
-          "caip2": {
-            "type": "string",
-            "description": "Chain identifier in CAIP-2 format",
-            "example": "eip155:1"
-          },
-          "last_updated": {
-            "type": "integer",
-            "description": "Timestamp when balance was last updated",
-            "example": 1753766031400
+            "nullable": true,
+            "description": "Unconfirmed balance (only populated for Bitcoin)",
+            "example": null
           }
-        }
+        },
+        "required": [
+          "chain",
+          "chain_id",
+          "address",
+          "balance",
+          "unit",
+          "unconfirmed_balance"
+        ]
       },
       "Transaction": {
         "type": "object",
         "description": "Transaction object",
         "properties": {
-          "hash": {
+          "id": {
             "type": "string",
-            "description": "Transaction hash",
-            "example": "0x7c91ba85d67ef92cc15f3e9c8d8c5788e982cf83fabe9bfcc66a747aa0bd3701"
+            "format": "uuid",
+            "description": "Unique transaction identifier",
+            "example": "5ebae608-8f0d-4d53-bd8c-236271a464ff"
           },
-          "from": {
+          "wallet_id": {
             "type": "string",
-            "description": "Sender address",
-            "example": "0x226d2AeCE1a29d84FD133aEAa1584BaE853CF02D"
+            "format": "uuid",
+            "description": "Wallet identifier",
+            "example": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c"
           },
-          "to": {
+          "network": {
+            "type": "string",
+            "description": "Network name",
+            "example": "Testnet"
+          },
+          "recipient": {
             "type": "string",
             "description": "Recipient address",
-            "example": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+            "example": "0x1ed419492279cf08b558326c2e66eae03be20d47"
           },
-          "value": {
+          "amount": {
             "type": "string",
-            "description": "Transaction value in wei",
-            "example": "1000000000000000"
+            "description": "Transaction amount in smallest unit",
+            "example": "100000000000000"
           },
-          "status": {
+          "chain_type": {
             "type": "string",
-            "enum": ["pending", "confirmed", "failed"],
-            "description": "Transaction status",
-            "example": "confirmed"
+            "description": "Chain type identifier",
+            "example": "ETHEREUM"
           },
-          "block_number": {
+          "chain_id": {
+            "type": "string",
+            "description": "Chain identifier",
+            "example": "11155111"
+          },
+          "tx_id": {
+            "type": "string",
+            "description": "Transaction hash on the blockchain",
+            "example": "0x74cba0f0ef45f8fc63a60bd081f45b27581e7e45dab37ba9a56156ccf55023be"
+          },
+          "created_at": {
             "type": "integer",
-            "nullable": true,
-            "description": "Block number where transaction was included",
-            "example": 12345678
-          },
-          "gas_used": {
-            "type": "integer",
-            "nullable": true,
-            "description": "Gas used by the transaction",
-            "example": 21000
-          },
-          "gas_price": {
-            "type": "string",
-            "nullable": true,
-            "description": "Gas price in wei",
-            "example": "20000000000"
-          },
-          "timestamp": {
-            "type": "integer",
-            "description": "Transaction timestamp",
-            "example": 1753766031400
-          },
-          "caip2": {
-            "type": "string",
-            "description": "Chain identifier in CAIP-2 format",
-            "example": "eip155:1"
+            "description": "Timestamp when the transaction was created",
+            "example": 1757933283
           }
         }
       },
       "TransactionsResponse": {
-        "type": "object",
+        "type": "array",
         "description": "Response for wallet transactions",
-        "properties": {
-          "transactions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Transaction"
-            }
-          },
-          "total": {
-            "type": "integer",
-            "description": "Total number of transactions",
-            "example": 150
-          },
-          "has_more": {
-            "type": "boolean",
-            "description": "Whether there are more transactions to fetch",
-            "example": true
-          }
+        "items": {
+          "$ref": "#/components/schemas/Transaction"
         }
       },
       "WalletNotFoundResponse": {
@@ -9492,41 +9378,52 @@
         },
         "required": ["method", "params"]
       },
+      "ActionType": {
+        "type": "string",
+        "description": "Type of wallet action",
+        "enum": ["Send", "Sign"],
+        "example": "Send"
+      },
+      "Payload": {
+        "type": "object",
+        "description": "Payload data for wallet operations",
+        "properties": {
+          "reciever": {
+            "type": "string",
+            "description": "Recipient address",
+            "example": "tb1qz0pnh98kfynptg9dtkj06f7sqnlxl3dxnmnjw4"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Amount to send",
+            "example": "10000"
+          },
+          "token_id": {
+            "type": "string",
+            "description": "Token ID (needed for SUI and Starknet)",
+            "example": "0x1234567890abcdef"
+          }
+        },
+        "required": ["reciever", "amount"]
+      },
       "WalletRPCRequest": {
         "type": "object",
-        "description": "Wallet RPC request - supports multiple RPC methods",
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/PersonalSignRequest"
+        "description": "Wallet RPC request",
+        "properties": {
+          "chain_type": {
+            "type": "string",
+            "description": "Blockchain type",
+            "enum": ["BITCOIN", "ETHEREUM", "SOLANA", "STARKNET", "SUI"],
+            "example": "BITCOIN"
           },
-          {
-            "$ref": "#/components/schemas/EthSendTransactionRequest"
+          "type": {
+            "$ref": "#/components/schemas/ActionType"
           },
-          {
-            "$ref": "#/components/schemas/EthSignTransactionRequest"
-          },
-          {
-            "$ref": "#/components/schemas/EthSignTypedDataRequest"
-          },
-          {
-            "$ref": "#/components/schemas/EthSign7702AuthorizationRequest"
-          },
-          {
-            "$ref": "#/components/schemas/Secp256k1SignRequest"
-          },
-          {
-            "$ref": "#/components/schemas/SignMessageRequest"
-          },
-          {
-            "$ref": "#/components/schemas/SignTransactionRequest"
-          },
-          {
-            "$ref": "#/components/schemas/SignAndSendTransactionRequest"
-          },
-          {
-            "$ref": "#/components/schemas/RawSignRequest"
+          "data": {
+            "$ref": "#/components/schemas/Payload"
           }
-        ]
+        },
+        "required": ["chain_type", "type", "data"]
       },
       "PersonalSignResponse": {
         "type": "object",
@@ -9838,39 +9735,20 @@
       },
       "WalletRPCResponse": {
         "type": "object",
-        "description": "Wallet RPC response - supports multiple RPC methods",
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/PersonalSignResponse"
+        "description": "Wallet RPC response",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful",
+            "example": true
           },
-          {
-            "$ref": "#/components/schemas/EthSendTransactionResponse"
-          },
-          {
-            "$ref": "#/components/schemas/EthSignTransactionResponse"
-          },
-          {
-            "$ref": "#/components/schemas/EthSignTypedDataResponse"
-          },
-          {
-            "$ref": "#/components/schemas/EthSign7702AuthorizationResponse"
-          },
-          {
-            "$ref": "#/components/schemas/Secp256k1SignResponse"
-          },
-          {
-            "$ref": "#/components/schemas/SignMessageResponse"
-          },
-          {
-            "$ref": "#/components/schemas/SignTransactionResponse"
-          },
-          {
-            "$ref": "#/components/schemas/SignAndSendTransactionResponse"
-          },
-          {
-            "$ref": "#/components/schemas/RawSignResponse"
+          "tx_id": {
+            "type": "string",
+            "description": "Transaction ID or hash",
+            "example": "0x74cba0f0ef45f8fc63a60bd081f45b27581e7e45dab37ba9a56156ccf55023be"
           }
-        ]
+        },
+        "required": ["success", "tx_id"]
       },
       "WalletRPCRateLimitResponse": {
         "type": "object",

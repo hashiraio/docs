@@ -1,4 +1,78 @@
 ---
-title: "Wallet"
+title: "Update Wallet"
 openapi: "PATCH /v1/wallets/{walletId}"
 ---
+
+import { ApiEndpoint } from "@site/src/components/ApiEndpoint";
+
+<ApiEndpoint
+  method="PATCH"
+  path="/v1/wallets/{walletId}"
+  summary="Update wallet"
+  description="Update wallet configuration. Currently a placeholder endpoint with no implementation."
+  auth="Bearer Token"
+/>
+
+## Parameters
+
+### Path Parameters
+
+| Parameter | Type   | Required | Description      |
+| --------- | ------ | -------- | ---------------- |
+| walletId  | string | Yes      | Wallet ID (UUID) |
+
+## Response
+
+### Success Response (200)
+
+Currently returns an empty response body as this is a placeholder endpoint.
+
+### Error Responses
+
+| Status Code | Description                       |
+| ----------- | --------------------------------- |
+| 400         | Bad Request - Invalid UUID format |
+| 401         | Unauthorized - Invalid JWT token  |
+| 404         | Not Found - Wallet not found      |
+| 500         | Internal Server Error             |
+
+## Implementation Status
+
+⚠️ **Note**: This endpoint is currently a placeholder and has no implementation. The controller function `update_wallet_by_id` is empty and returns no response.
+
+Future implementation may include:
+
+- Updating wallet metadata
+- Modifying wallet policies
+- Changing wallet configuration
+
+## Example Usage
+
+```javascript
+// Update wallet (placeholder - no current implementation)
+const updateWallet = async (walletId, accessToken) => {
+  const response = await fetch(
+    `https://api.catalog.fi/v1/wallets/${walletId}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response.ok;
+};
+
+// Usage (currently returns empty response)
+try {
+  const success = await updateWallet(
+    "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c",
+    accessToken
+  );
+  console.log("Update request sent:", success);
+} catch (error) {
+  console.error("Error updating wallet:", error);
+}
+```

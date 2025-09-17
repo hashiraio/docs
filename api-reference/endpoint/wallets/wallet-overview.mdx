@@ -1,88 +1,228 @@
 ---
 title: "Overview"
-description: "Manage blockchain wallets, execute transactions, and handle wallet operations through our comprehensive Wallets API"
+description: "Get blockchain wallets, for 5 chains including Bitcoin, EVM, Starknet, Sui and Solana without having to worry about your private keys"
 ---
 
 # Wallet Management
 
-Catalog API provides comprehensive endpoints for managing blockchain wallets, executing transactions, and handling various wallet operations across multiple blockchains.
+Catalog API provides comprehensive endpoints for creating and interacting with all main blockchain wallets which inculdes sending crypto across the following chains including Bitcoin, EVM, Solana, Starknet and SUI.
 
 ## Quick Start - Wallet Management
 
 <Steps>
-  <Step title="Create Wallet">Create a new wallet for your app</Step>
-  <Step title="Get Wallet Details">
-    Retrieve wallet information and balance
+  <Step title="Create Wallets">
+    As soon as you sign-up to any of our products that are managed via catalog,
+    all the wallets across the 5 chains are automatically created on your
+    behalf.
   </Step>
-  <Step title="Execute Transactions">Send transactions and sign messages</Step>
-  <Step title="Monitor Activity">Track wallet transactions and balance</Step>
+  <Step title="Get Wallet Details">
+    We provide a comprehensive set of endpoints for all your needs, be it
+    getting your balances, transactions or sending transactions
+  </Step>
+  <Step title="Execute Transactions">
+    Our API endpoints provide you with robust endpoints to execute the
+    transactions to transfer crypto to any chain you'd like provided they are
+    amoung the 5 we support
+  </Step>
 </Steps>
 
 ## Wallet Endpoints Overview
 
 ### Core Wallet Management
 
-- **Create Wallet** - Create a new wallet for your app with optional configuration
-- **Get Wallet** - Retrieve detailed information about a specific wallet
-- **Update Wallet** - Update wallet configuration, tags, and policies
-- **Get Wallets** - List all wallets with optional filtering and pagination
+- **Create Wallets** - Create wallets for all 5 supported chains (Bitcoin, Ethereum, Solana, Starknet, Sui) for a user
+- **Get Wallet** - Retrieve detailed information about a specific wallet by ID
+- **Update Wallet** - Update wallet configuration (currently placeholder for future implementation)
+- **Get Wallets** - List all wallets with filtering by account_id, app_id, or owner_id
 
 ### Wallet Operations
 
-- **Get Wallet Balance** - Retrieve current balance across different chains
-- **Get Wallet Transactions** - View transaction history with filtering
-- **Export Wallet** - Export wallet data for backup or migration
-- **Wallet RPC Operations** - Execute various RPC operations (signing, transactions, etc.)
+- **Get Wallet Balance** - Retrieve current balance for specific wallet across different chains
+- **Get Wallet Transactions** - View transaction history with pagination (limit/offset)
+- **Wallet RPC Operations** - Execute send transactions and signing operations
 
 ### Supported Blockchains
 
-- **Ethereum** - Full support for Ethereum and EVM-compatible chains
-- **Solana** - Complete Solana wallet operations
-- **Multi-Chain** - Cross-chain wallet management and operations
+- **Bitcoin** - Full Bitcoin wallet operations with confirmed/unconfirmed balance tracking
+- **Ethereum** - Complete Ethereum wallet operations (Sepolia testnet)
+- **Solana** - Full Solana wallet operations
+- **Starknet** - Starknet wallet operations with token ID support
+- **Sui** - Sui blockchain wallet operations with optional token ID support
+
+### Chain-Specific Details (Testnet)
+
+| Chain    | Balance Unit | Chain ID           | Special Requirements                  |
+| -------- | ------------ | ------------------ | ------------------------------------- |
+| Bitcoin  | SAT          | N/A                | Tracks confirmed/unconfirmed balances |
+| Ethereum | WEI          | 11155111 (Sepolia) | Standard EVM operations               |
+| Solana   | LAMPORT      | N/A                | Standard Solana operations            |
+| Starknet | FELT         | N/A                | Requires token_id for transactions    |
+| Sui      | MIST         | N/A                | Optional token_id for transactions    |
+
+## Available Endpoints
+
+| Method | Endpoint                           | Description                   | Parameters                                             |
+| ------ | ---------------------------------- | ----------------------------- | ------------------------------------------------------ |
+| `GET`  | `/wallets`                         | Get wallets with filters      | `account_id`, `app_id`, `owner_id` (query params)      |
+| `POST` | `/wallets`                         | Create wallets for all chains | `chain_type`, `app_id`, `owner_id` (body)              |
+| `GET`  | `/wallets/{walletId}`              | Get wallet by ID              | `walletId` (path)                                      |
+| `GET`  | `/wallets/{walletId}/balance`      | Get wallet balance            | `walletId` (path)                                      |
+| `GET`  | `/wallets/{walletId}/transactions` | Get wallet transactions       | `walletId` (path), `limit`, `offset` (query params)    |
+| `POST` | `/wallets/{walletId}/rpc`          | Execute wallet RPC operations | `walletId` (path), `chain_type`, `type`, `data` (body) |
 
 ## Authentication
 
-Wallet endpoints use different authentication methods depending on the operation:
+All wallet endpoints use JWT Bearer token authentication. The authentication is handled by the `auth_guard` middleware which validates the JWT token from the `Authorization` header and makes sure you're the owner of the wallet you're trying to execute transactions for.
 
-- **Bearer Token** - For most wallet management operations
-- **Basic Auth** - For certain administrative operations
-- **App-Level Auth** - For app-specific wallet operations
+- **JWT Bearer Token** - Required for all wallet operations
+- **App User Context** - User and app information is extracted from the JWT token
 
 ## Common Headers
 
-| Header           | Type   | Required | Description                |
-| ---------------- | ------ | -------- | -------------------------- |
-| `Authorization`  | string | Yes      | Bearer token or Basic auth |
-| `catalog-app-id` | string | Yes      | Your Catalog app ID        |
-| `Content-Type`   | string | Yes      | application/json           |
+| Header          | Type   | Required | Description      |
+| --------------- | ------ | -------- | ---------------- |
+| `Authorization` | string | Yes      | Bearer JWT token |
+| `Content-Type`  | string | Yes      | application/json |
 
-## Response Format
+## Response Formats
 
-Wallet endpoints return JSON responses with consistent structure:
+### Create Wallets Response
+
+The `POST /wallets` endpoint returns no response body (HTTP 200 with empty body) as it creates wallets for all 5 chains in the background.
+
+### GET /wallet Response
+
+```json
+[
+  {
+    "id": "76f3f233-9a99-486e-bab2-dc0518ba3dac",
+    "address": "tb1pvr68mmpfew4r48xrl8d4txkjmj73qejj8m7r49e5fpsrl8zpf5uqywmgrh",
+    "chain_type": "BITCOIN",
+    "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+    "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+    "policy_ids": [],
+    "created_at": 1757931209
+  },
+  {
+    "id": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c",
+    "address": "0x3e17f24a1dddf32084520e165b426448741d4fb2",
+    "chain_type": "ETHEREUM",
+    "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+    "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+    "policy_ids": [],
+    "created_at": 1757931209
+  },
+  {
+    "id": "5e5049a0-a192-4153-adc7-1e039d6ed8e4",
+    "address": "3gpYs9qsugXnvikxRAWiqZMFifUPbxAVk7SbA543tB4y",
+    "chain_type": "SOLANA",
+    "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+    "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+    "policy_ids": [],
+    "created_at": 1757931209
+  },
+  {
+    "id": "e7d1067c-2641-484c-ab72-c3b134c7e21c",
+    "address": "0x287eab862f8fda704a760485da302dc0ee38fbb864969d37041aa9131337464",
+    "chain_type": "STARKNET",
+    "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+    "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+    "policy_ids": [],
+    "created_at": 1757931209
+  },
+  {
+    "id": "7676adbf-6b00-4f84-b143-67b18d644ac3",
+    "address": "0x756fce35d5b9ee5ad3df75c0c784c273bc6e1cd8c422ac07aec67b2daed1c201",
+    "chain_type": "SUI",
+    "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+    "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+    "policy_ids": [],
+    "created_at": 1757931209
+  }
+]
+```
+
+### Wallet Balance Response
 
 ```json
 {
-  "id": "wallet_123",
-  "address": "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6",
-  "chain": "ethereum",
-  "balance": "0.1",
-  "created_at": 1752036285,
-  "configuration": {
-    // Wallet configuration details
+  "chain": "STARKNET",
+  "chain_id": null,
+  "address": "0x287eab862f8fda704a760485da302dc0ee38fbb864969d37041aa9131337464",
+  "balance": "7715666681861379520",
+  "unit": "FELT",
+  "unconfirmed_balance": null
+}
+```
+
+### Transaction Response
+
+```json
+[
+  {
+    "id": "5ebae608-8f0d-4d53-bd8c-236271a464ff",
+    "wallet_id": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c",
+    "network": "Testnet",
+    "recipient": "0x1ed419492279cf08b558326c2e66eae03be20d47",
+    "amount": "100000000000000",
+    "chain_type": "ETHEREUM",
+    "chain_id": "11155111",
+    "tx_id": "0x74cba0f0ef45f8fc63a60bd081f45b27581e7e45dab37ba9a56156ccf55023be",
+    "created_at": 1757933283
   }
+]
+```
+
+### Wallet RPC Request
+
+```json
+{
+  "chain_type": "ETHEREUM",
+  "type": "Send",
+  "data": {
+    "reciever": "0x1ed419492279cf08b558326c2e66eae03be20d47",
+    "amount": "100000000000000"
+  }
+}
+```
+
+### Wallet RPC Response
+
+```json
+{
+  "success": true,
+  "tx_id": "0x27690927920e59ee062806e85a0766f60ffbabe5b82e2c00a0b7a59d3482f3c6"
 }
 ```
 
 ## Error Handling
 
-Wallet endpoints use standard HTTP status codes:
+Wallet endpoints use standard HTTP status codes and return detailed error messages:
+
+### HTTP Status Codes
 
 - **200** - Success
-- **400** - Bad Request (invalid parameters)
-- **401** - Unauthorized (invalid credentials)
+- **400** - Bad Request (invalid parameters, insufficient balance, invalid amount)
+- **401** - Unauthorized (invalid JWT token)
 - **403** - Forbidden (insufficient permissions)
 - **404** - Wallet not found
-- **429** - Rate limit exceeded
+- **500** - Internal Server Error (wallet creation/loading failed, balance retrieval failed)
+
+### Wallet-Specific Errors
+
+| Error Type               | HTTP Status | Description                                        |
+| ------------------------ | ----------- | -------------------------------------------------- |
+| `WalletNotFound`         | 404         | The requested wallet does not exist                |
+| `InsufficientBalance`    | 400         | Not enough balance for the transaction             |
+| `InvalidAddress`         | 400         | The provided wallet address is invalid             |
+| `InvalidAmount`          | 400         | The provided amount format is invalid              |
+| `UnsupportedChainType`   | 400         | The chain type is not supported                    |
+| `TokenIdRequired`        | 400         | Token ID is required for Starknet/Sui transactions |
+| `WalletCreationFailed`   | 500         | Failed to create the wallet                        |
+| `WalletLoadFailed`       | 500         | Failed to load the wallet                          |
+| `TransactionFailed`      | 400         | Transaction execution failed                       |
+| `BalanceRetrievalFailed` | 500         | Failed to retrieve wallet balance                  |
+| `TransactionSaveFailed`  | 500         | Failed to save transaction to database             |
 
 ## Best Practices
 
@@ -109,27 +249,24 @@ Wallet endpoints use standard HTTP status codes:
 
 ## Complete Example
 
-Here's a complete example of wallet management:
+Here's a complete example of wallet management using the actual API:
 
 ```javascript
-// Create a new wallet
-const createWallet = async (appId, accessToken) => {
-  const response = await fetch(
-    `https://api.catalog.fi/v1/apps/${appId}/wallets`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "catalog-app-id": "your-catalog-app-id",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        chain_type: "ethereum",
-        user_id: "user_123",
-      }),
-    }
-  );
-  return response.json();
+// Create wallets for all chains
+const createWallets = async (accessToken) => {
+  const response = await fetch(`https://api.catalog.fi/v1/wallets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      app_id: "550e8400-e29b-41d4-a716-446655440001",
+      owner_id: "550e8400-e29b-41d4-a716-446655440002",
+    }),
+  });
+  // No response body - just check if successful
+  return response.ok;
 };
 
 // Get wallet details
@@ -140,7 +277,26 @@ const getWallet = async (walletId, accessToken) => {
       method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "catalog-app-id": "your-catalog-app-id",
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.json();
+};
+
+// Get wallets with filters
+const getWallets = async (filters, accessToken) => {
+  const queryParams = new URLSearchParams();
+  if (filters.account_id) queryParams.append("account_id", filters.account_id);
+  if (filters.app_id) queryParams.append("app_id", filters.app_id);
+  if (filters.owner_id) queryParams.append("owner_id", filters.owner_id);
+
+  const response = await fetch(
+    `https://api.catalog.fi/v1/wallets?${queryParams}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
     }
@@ -156,7 +312,6 @@ const getWalletBalance = async (walletId, accessToken) => {
       method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "catalog-app-id": "your-catalog-app-id",
         "Content-Type": "application/json",
       },
     }
@@ -164,58 +319,46 @@ const getWalletBalance = async (walletId, accessToken) => {
   return response.json();
 };
 
-// Execute a transaction
-const sendTransaction = async (walletId, transaction, accessToken) => {
+// Get wallet transactions
+const getWalletTransactions = async (walletId, params, accessToken) => {
+  const queryParams = new URLSearchParams();
+  if (params.limit) queryParams.append("limit", params.limit);
+  if (params.offset) queryParams.append("offset", params.offset);
+
+  const response = await fetch(
+    `https://api.catalog.fi/v1/wallets/${walletId}/transactions?${queryParams}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.json();
+};
+
+// Execute a transaction (Send)
+const sendTransaction = async (walletId, transactionData, accessToken) => {
   const response = await fetch(
     `https://api.catalog.fi/v1/wallets/${walletId}/rpc`,
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "catalog-app-id": "your-catalog-app-id",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        method: "eth_sendTransaction",
-        caip2: "eip155:1",
-        chain_type: "ethereum",
-        params: {
-          transaction: {
-            to: transaction.to,
-            value: transaction.value,
-            gas_limit: transaction.gasLimit,
-          },
+        chain_type: "ETHEREUM",
+        type: "Send",
+        data: {
+          reciever: transactionData.recipient,
+          amount: transactionData.amount,
+          token_id: transactionData.token_id, // Optional for Sui (Required for Starknet)
         },
       }),
     }
   );
   return response.json();
 };
-
-// Usage example
-const manageWallet = async (appId, accessToken) => {
-  // Create a new wallet
-  const newWallet = await createWallet(appId, accessToken);
-
-  // Get wallet details
-  const walletDetails = await getWallet(newWallet.id, accessToken);
-
-  // Get balance
-  const balance = await getWalletBalance(newWallet.id, accessToken);
-
-  // Send a transaction
-  const txResult = await sendTransaction(
-    newWallet.id,
-    {
-      to: "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6",
-      value: "0.001",
-      gasLimit: "21000",
-    },
-    accessToken
-  );
-
-  return { newWallet, walletDetails, balance, txResult };
-};
 ```
-
-This comprehensive wallet management system allows you to fully control blockchain wallets and execute transactions programmatically across multiple blockchains.

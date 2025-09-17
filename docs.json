@@ -51,11 +51,9 @@
               "api-reference/endpoint/wallets/create",
               "api-reference/endpoint/wallets/get",
               "api-reference/endpoint/wallets/get-wallets",
-              "api-reference/endpoint/wallets/update",
               "api-reference/endpoint/wallets/get-balance",
               "api-reference/endpoint/wallets/get-transactions",
-              "api-reference/endpoint/wallets/operations",
-              "api-reference/endpoint/wallets/export"
+              "api-reference/endpoint/wallets/operations"
             ]
           },
           {
