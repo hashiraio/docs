@@ -1410,7 +1410,7 @@
     "/v1/wallets/{walletId}": {
       "get": {
         "summary": "Get wallet",
-        "description": "Retrieves details of a specific wallet by ID",
+        "description": "Retrieves details of a specific wallet by walletId",
         "tags": ["Wallets"],
         "security": [
           {
@@ -1594,7 +1594,7 @@
       },
       "get": {
         "summary": "Get all wallets",
-        "description": "Retrieves a list of wallets for the app with optional filtering",
+        "description": "Retrieves a list of wallets for the app with optional filterin (NOTE: You'd need to give atleast one query param for it to work)",
         "tags": ["Wallets"],
         "security": [
           {
@@ -1726,7 +1726,7 @@
     "/v1/wallets/{walletId}/transactions": {
       "get": {
         "summary": "Get wallet transactions",
-        "description": "Retrieves transaction history for a specific wallet",
+        "description": "Retrieves transaction history (Wallet transactions + transaction Contract Calls) for a specific wallet",
         "tags": ["Wallets"],
         "security": [
           {
@@ -1786,8 +1786,8 @@
     },
     "/v1/wallets/{walletId}/rpc": {
       "post": {
-        "summary": "Wallet Actions",
-        "description": "Performs RPC calls on a wallet.",
+        "summary": "Wallet RPC Operations",
+        "description": "Performs comprehensive RPC operations on a wallet including native token transfers and ERC-20 contract interactions. Supports Send operations for native token transfers and Call operations for ERC-20 contract methods on both EVM (Ethereum Sepolia) and Starknet networks. View methods return both hex and parsed data, while state-changing methods return transaction IDs.",
         "tags": ["Wallets"],
         "security": [
           {
@@ -1812,6 +1812,134 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/WalletRPCRequest"
+              },
+              "examples": {
+                "send_evm_native": {
+                  "summary": "Send Native ETH (EVM)",
+                  "description": "Transfer native ETH on Ethereum Sepolia testnet",
+                  "value": {
+                    "chain_type": "EVM",
+                    "chain_id": "11155111",
+                    "type": "Send",
+                    "data": {
+                      "reciever": "0x1ed419492279cf08b558326c2e66eae03be20d47",
+                      "amount": "100000000000000"
+                    }
+                  }
+                },
+                "erc20_balance_check": {
+                  "summary": "Check ERC-20 Token Balance (EVM)",
+                  "description": "View call to check token balance on EVM",
+                  "value": {
+                    "chain_type": "EVM",
+                    "chain_id": "11155111",
+                    "type": "Call",
+                    "data": {
+                      "type": "ERC20",
+                      "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+                      "method": "balanceOf",
+                      "params": ["0xc2301b62ff12DfBC708894B1d20FAfE31Cc6Cb0a"]
+                    }
+                  }
+                },
+                "erc20_approve": {
+                  "summary": "Approve ERC-20 Token Spending (EVM)",
+                  "description": "State-changing call to approve token spending on EVM",
+                  "value": {
+                    "chain_type": "EVM",
+                    "chain_id": "11155111",
+                    "type": "Call",
+                    "data": {
+                      "type": "ERC20",
+                      "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+                      "method": "approve",
+                      "params": [
+                        "0x34e50a179c9e497c43b14275413425c80253edd2",
+                        "1000"
+                      ]
+                    }
+                  }
+                },
+                "erc20_transfer": {
+                  "summary": "Transfer ERC-20 Tokens (EVM)",
+                  "description": "State-changing call to transfer tokens on EVM",
+                  "value": {
+                    "chain_type": "EVM",
+                    "chain_id": "11155111",
+                    "type": "Call",
+                    "data": {
+                      "type": "ERC20",
+                      "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+                      "method": "transfer",
+                      "params": [
+                        "0x34e50a179c9e497c43b14275413425c80253edd2",
+                        "1"
+                      ]
+                    }
+                  }
+                },
+                "starknet_balance_check": {
+                  "summary": "Check ERC-20 Token Balance (Starknet)",
+                  "description": "View call to check token balance on Starknet",
+                  "value": {
+                    "chain_type": "STARKNET",
+                    "chain_id": "21280703052830640944970871415780893550344133951",
+                    "type": "Call",
+                    "data": {
+                      "type": "ERC20",
+                      "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+                      "method": "balanceOf",
+                      "params": [
+                        "0x0148a1989328bde22c510a9f637c44e87817bf2f3e2760b783575789b23bf2df"
+                      ]
+                    }
+                  }
+                },
+                "starknet_approve": {
+                  "summary": "Approve ERC-20 Token Spending (Starknet)",
+                  "description": "State-changing call to approve token spending on Starknet",
+                  "value": {
+                    "chain_type": "STARKNET",
+                    "chain_id": "21280703052830640944970871415780893550344133951",
+                    "type": "Call",
+                    "data": {
+                      "type": "ERC20",
+                      "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+                      "method": "approve",
+                      "params": [
+                        "0x30bc78c905609a394b0135e3c2685e8014c812b154cba3a0a571bf7899c5ada",
+                        "1000"
+                      ]
+                    }
+                  }
+                },
+                "bitcoin_send": {
+                  "summary": "Send Bitcoin",
+                  "description": "Transfer Bitcoin on testnet",
+                  "value": {
+                    "chain_type": "BITCOIN",
+                    "chain_id": "testnet",
+                    "type": "Send",
+                    "data": {
+                      "reciever": "tb1qz0pnh98kfynptg9dtkj06f7sqnlxl3dxnmnjw4",
+                      "amount": "10000"
+                    }
+                  }
+                },
+                "starknet_native_send": {
+                  "summary": "Send Native Starknet Token",
+                  "description": "Transfer native STRK tokens on Starknet with token_id",
+                  "value": {
+                    "chain_type": "STARKNET",
+                    "chain_id": "21280703052830640944970871415780893550344133951",
+                    "type": "Send",
+                    "data": {
+                      "reciever": "0x0437b14f4ab3d975f97c771912c44e5b1b1d67b6a5d1718f5d09a6c085f8c977",
+                      "amount": "100000000000000000",
+                      "token_id": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+                    }
+                  }
+                }
               }
             }
           }
@@ -6844,13 +6972,18 @@
           "address": {
             "type": "string",
             "description": "Wallet address on the blockchain",
-            "example": "tb1pvr68mmpfew4r48xrl8d4txkjmj73qejj8m7r49e5fpsrl8zpf5uqywmgrh"
+            "example": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07"
+          },
+          "chain_id": {
+            "type": "string",
+            "description": "The chain the created wallets belong to. For more details on chainIds refer the wallet overview section",
+            "example": "11155111"
           },
           "chain_type": {
             "type": "string",
-            "enum": ["BITCOIN", "ETHEREUM", "SOLANA", "STARKNET", "SUI"],
+            "enum": ["BITCOIN", "EVM", "SOLANA", "STARKNET", "SUI"],
             "description": "Type of blockchain for the wallet",
-            "example": "BITCOIN"
+            "example": "EVM"
           },
           "app_id": {
             "type": "string",
@@ -6894,49 +7027,54 @@
         },
         "example": [
           {
-            "id": "76f3f233-9a99-486e-bab2-dc0518ba3dac",
-            "address": "tb1pvr68mmpfew4r48xrl8d4txkjmj73qejj8m7r49e5fpsrl8zpf5uqywmgrh",
+            "id": "d17f3569-eadd-42dd-97a2-6165fb1d3c89",
+            "address": "tb1p7r56lzu0g5p6mze2q34zmyp4rqkt277s0xshrz7gu8ahvych72kssd5ke0",
             "chain_type": "BITCOIN",
+            "chain_id": "testnet",
             "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
-            "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+            "owner_id": "293b0aad-0c46-4667-b4b3-66ef5487865c",
             "policy_ids": [],
-            "created_at": 1757931209
+            "created_at": 1758521040
           },
           {
-            "id": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c",
-            "address": "0x3e17f24a1dddf32084520e165b426448741d4fb2",
-            "chain_type": "ETHEREUM",
+            "id": "fa6ee90b-8ad9-43a6-801c-652bd3df4ca0",
+            "address": "0x34e50a179c9e497c43b14275413425c80253edd2",
+            "chain_type": "EVM",
+            "chain_id": "11155111",
             "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
-            "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+            "owner_id": "293b0aad-0c46-4667-b4b3-66ef5487865c",
             "policy_ids": [],
-            "created_at": 1757931209
+            "created_at": 1758521040
           },
           {
-            "id": "5e5049a0-a192-4153-adc7-1e039d6ed8e4",
-            "address": "3gpYs9qsugXnvikxRAWiqZMFifUPbxAVk7SbA543tB4y",
+            "id": "f4cc144a-9a79-4484-881c-a51cc663218d",
+            "address": "2GAV1nXzTjdm6SChzkoscjrNfqTsZYD3ko5ycctdeJpf",
             "chain_type": "SOLANA",
+            "chain_id": "devnet",
             "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
-            "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+            "owner_id": "293b0aad-0c46-4667-b4b3-66ef5487865c",
             "policy_ids": [],
-            "created_at": 1757931209
+            "created_at": 1758521040
           },
           {
-            "id": "e7d1067c-2641-484c-ab72-c3b134c7e21c",
-            "address": "0x287eab862f8fda704a760485da302dc0ee38fbb864969d37041aa9131337464",
+            "id": "51ee0675-498e-47f0-9c72-8d9b7a491c10",
+            "address": "0x30bc78c905609a394b0135e3c2685e8014c812b154cba3a0a571bf7899c5ada",
             "chain_type": "STARKNET",
+            "chain_id": "21280703052830640944970871415780893550344133951",
             "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
-            "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+            "owner_id": "293b0aad-0c46-4667-b4b3-66ef5487865c",
             "policy_ids": [],
-            "created_at": 1757931209
+            "created_at": 1758521040
           },
           {
-            "id": "7676adbf-6b00-4f84-b143-67b18d644ac3",
-            "address": "0x756fce35d5b9ee5ad3df75c0c784c273bc6e1cd8c422ac07aec67b2daed1c201",
+            "id": "8c23dc28-32cf-4ce9-bbbd-6e25f2f2ecb5",
+            "address": "0xe3a05d3178ed38c5babb7ad9771b84369ebd89082b5d0392c5a57013ac39d233",
             "chain_type": "SUI",
+            "chain_id": "testnet",
             "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
-            "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+            "owner_id": "293b0aad-0c46-4667-b4b3-66ef5487865c",
             "policy_ids": [],
-            "created_at": 1757931209
+            "created_at": 1758521040
           }
         ]
       },
@@ -8778,13 +8916,13 @@
           "chain": {
             "type": "string",
             "description": "Chain type identifier",
-            "example": "STARKNET"
+            "example": "EVM"
           },
           "chain_id": {
             "type": "string",
             "nullable": true,
-            "description": "Chain identifier (null for some chains)",
-            "example": null
+            "description": "Chain identifier",
+            "example": "11155111"
           },
           "address": {
             "type": "string",
@@ -8794,12 +8932,12 @@
           "balance": {
             "type": "string",
             "description": "Wallet balance in smallest unit",
-            "example": "7715666681861379520"
+            "example": "4899597513893689"
           },
           "unit": {
             "type": "string",
             "description": "Unit of the balance",
-            "example": "FELT"
+            "example": "WEI"
           },
           "unconfirmed_balance": {
             "type": "string",
@@ -8851,15 +8989,17 @@
           "chain_type": {
             "type": "string",
             "description": "Chain type identifier",
-            "example": "ETHEREUM"
+            "example": "EVM"
           },
           "chain_id": {
             "type": "string",
+            "nullable": true,
             "description": "Chain identifier",
             "example": "11155111"
           },
           "tx_id": {
             "type": "string",
+            "nullable": true,
             "description": "Transaction hash on the blockchain",
             "example": "0x74cba0f0ef45f8fc63a60bd081f45b27581e7e45dab37ba9a56156ccf55023be"
           },
@@ -8870,11 +9010,77 @@
           }
         }
       },
+      "ContractTransaction": {
+        "type": "object",
+        "description": "Contract call (ERC-20 or similar) transaction object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique transaction identifier",
+            "example": "aaaae5e0-56d4-42b9-8b93-95c9a9bca420"
+          },
+          "wallet_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Wallet identifier",
+            "example": "fa6ee90b-8ad9-43a6-801c-652bd3df4ca0"
+          },
+          "chain_type": {
+            "type": "string",
+            "description": "Chain type identifier",
+            "example": "EVM"
+          },
+          "chain_id": {
+            "type": "string",
+            "description": "Chain identifier",
+            "example": "11155111"
+          },
+          "network": {
+            "type": "string",
+            "description": "Network name",
+            "example": "Testnet"
+          },
+          "contract_address": {
+            "type": "string",
+            "description": "Contract address",
+            "example": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07"
+          },
+          "method": {
+            "type": "string",
+            "description": "Contract method invoked",
+            "example": "approve"
+          },
+          "params": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Parameters passed to the contract method",
+            "example": ["0xcA2b82Da750267D7631173105f61708206E290b5", "1000"]
+          },
+          "tx_id": {
+            "type": "string",
+            "description": "Transaction hash on the blockchain",
+            "example": "0x68d7ff1c5ec2bc2f34114ed0229776442b27ba2e24cb410034a8ad9679d6b894"
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Timestamp when the transaction was created",
+            "example": 1758607015
+          }
+        }
+      },
       "TransactionsResponse": {
-        "type": "array",
-        "description": "Response for wallet transactions",
-        "items": {
-          "$ref": "#/components/schemas/Transaction"
+        "type": "object",
+        "description": "Combined response containing wallet transfers and contract calls",
+        "properties": {
+          "contract": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ContractTransaction" }
+          },
+          "wallet": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Transaction" }
+          }
         }
       },
       "WalletNotFoundResponse": {
@@ -9380,8 +9586,8 @@
       },
       "ActionType": {
         "type": "string",
-        "description": "Type of wallet action",
-        "enum": ["Send", "Sign"],
+        "description": "Type of wallet action to perform",
+        "enum": ["Send", "Call"],
         "example": "Send"
       },
       "Payload": {
@@ -9406,24 +9612,83 @@
         },
         "required": ["reciever", "amount"]
       },
+      "ERC20Payload": {
+        "type": "object",
+        "description": "Payload data for ERC-20 contract calls on EVM and Starknet",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Contract type identifier",
+            "enum": ["ERC20"],
+            "example": "ERC20"
+          },
+          "address": {
+            "type": "string",
+            "description": "Contract address for the ERC-20 token",
+            "example": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07"
+          },
+          "method": {
+            "type": "string",
+            "description": "ERC-20 method name to call",
+            "enum": [
+              "balanceOf",
+              "totalSupply",
+              "name",
+              "symbol",
+              "decimals",
+              "allowance",
+              "transfer",
+              "approve",
+              "transferFrom",
+              "increaseAllowance",
+              "decreaseAllowance",
+              "increase_allowance",
+              "decrease_allowance"
+            ],
+            "example": "balanceOf"
+          },
+          "params": {
+            "type": "array",
+            "description": "Array of parameters for the contract method. Parameter format depends on the method being called.",
+            "items": {
+              "type": "string"
+            },
+            "example": ["0xc2301b62ff12DfBC708894B1d20FAfE31Cc6Cb0a"]
+          }
+        },
+        "required": ["type", "address", "method", "params"]
+      },
       "WalletRPCRequest": {
         "type": "object",
-        "description": "Wallet RPC request",
+        "description": "Wallet RPC request for performing various blockchain operations including transfers and contract calls",
         "properties": {
           "chain_type": {
             "type": "string",
             "description": "Blockchain type",
-            "enum": ["BITCOIN", "ETHEREUM", "SOLANA", "STARKNET", "SUI"],
-            "example": "BITCOIN"
+            "enum": ["BITCOIN", "EVM", "SOLANA", "STARKNET", "SUI"],
+            "example": "EVM"
+          },
+          "chain_id": {
+            "type": "string",
+            "description": "Chain ID for the blockchain network. Required for EVM chains (e.g., '1' for Ethereum mainnet, '11155111' for Sepolia testnet). For Starknet, use decimal chain IDs (e.g., '879618411357393635146340312313736732060953630524' for mainnet, '21280703052830640944970871415780893550344133951' for testnet).",
+            "example": "11155111"
           },
           "type": {
             "$ref": "#/components/schemas/ActionType"
           },
           "data": {
-            "$ref": "#/components/schemas/Payload"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Payload"
+              },
+              {
+                "$ref": "#/components/schemas/ERC20Payload"
+              }
+            ],
+            "description": "Payload data that varies based on the action type"
           }
         },
-        "required": ["chain_type", "type", "data"]
+        "required": ["chain_type", "chain_id", "type", "data"]
       },
       "PersonalSignResponse": {
         "type": "object",
@@ -9735,20 +10000,98 @@
       },
       "WalletRPCResponse": {
         "type": "object",
-        "description": "Wallet RPC response",
+        "description": "Wallet RPC response with different result types based on the operation performed",
         "properties": {
           "success": {
             "type": "boolean",
             "description": "Whether the operation was successful",
             "example": true
           },
-          "tx_id": {
-            "type": "string",
-            "description": "Transaction ID or hash",
-            "example": "0x74cba0f0ef45f8fc63a60bd081f45b27581e7e45dab37ba9a56156ccf55023be"
+          "result": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TransactionResult"
+              },
+              {
+                "$ref": "#/components/schemas/ViewCallResult"
+              },
+              {
+                "$ref": "#/components/schemas/StarknetViewCallResult"
+              }
+            ],
+            "description": "Result data that varies based on the operation type"
           }
         },
-        "required": ["success", "tx_id"]
+        "required": ["success", "result"]
+      },
+      "TransactionResult": {
+        "type": "object",
+        "description": "Result for state-changing operations that return a transaction ID",
+        "properties": {
+          "Transaction": {
+            "type": "object",
+            "properties": {
+              "tx_id": {
+                "type": "string",
+                "description": "Transaction ID or hash",
+                "example": "0x68d7ff1c5ec2bc2f34114ed0229776442b27ba2e24cb410034a8ad9679d6b894"
+              }
+            },
+            "required": ["tx_id"]
+          }
+        },
+        "required": ["Transaction"]
+      },
+      "ViewCallResult": {
+        "type": "object",
+        "description": "Result for EVM view calls that return both hex and parsed data",
+        "properties": {
+          "ViewCall": {
+            "type": "object",
+            "properties": {
+              "hex": {
+                "type": "string",
+                "description": "Raw hex response from the contract call",
+                "example": "0x00000000000000000000000000000000000000000000000000000000000186a1"
+              },
+              "parsed": {
+                "description": "Human-readable parsed value from the hex response",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Parsed string value (for numbers, addresses, or text)",
+                    "example": "100001"
+                  },
+                  {
+                    "type": "boolean",
+                    "description": "Parsed boolean value",
+                    "example": true
+                  }
+                ]
+              }
+            },
+            "required": ["hex", "parsed"]
+          }
+        },
+        "required": ["ViewCall"]
+      },
+      "StarknetViewCallResult": {
+        "type": "object",
+        "description": "Result for Starknet view calls that return direct data",
+        "properties": {
+          "StarknetViewCall": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "string",
+                "description": "Direct data response from Starknet contract call",
+                "example": "9986730879959026111"
+              }
+            },
+            "required": ["data"]
+          }
+        },
+        "required": ["StarknetViewCall"]
       },
       "WalletRPCRateLimitResponse": {
         "type": "object",
