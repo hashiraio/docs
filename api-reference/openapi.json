@@ -9691,6 +9691,96 @@
         },
         "required": ["type", "address", "method", "params"]
       },
+      "SignEIP712Payload": {
+        "type": "object",
+        "description": "Payload data for EIP-712 typed data signing in EVM",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Signing method type",
+            "enum": ["EIP-712"],
+            "example": "EIP-712"
+          },
+          "message": {
+            "type": "object",
+            "description": "EIP-712 typed structured data to sign",
+            "properties": {
+              "domain": {
+                "type": "object",
+                "description": "Domain separator parameters for EIP-712",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "User-readable name of signing domain",
+                    "example": "Test"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "Current version of signing domain",
+                    "example": "1"
+                  },
+                  "chainId": {
+                    "type": "string",
+                    "description": "EIP-155 chain id as hex string",
+                    "example": "0x7a69"
+                  },
+                  "verifyingContract": {
+                    "type": "string",
+                    "description": "Address of the contract that will verify the signature",
+                    "example": "0x0000000000000000000000000000000000000000"
+                  }
+                },
+                "required": ["name", "version", "chainId", "verifyingContract"]
+              },
+              "primaryType": {
+                "type": "string",
+                "description": "Primary type of the message being signed",
+                "example": "Message"
+              },
+              "types": {
+                "type": "object",
+                "description": "Type definitions for the structured data",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Field name"
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "Solidity type"
+                      }
+                    },
+                    "required": ["name", "type"]
+                  }
+                },
+                "example": {
+                  "EIP712Domain": [
+                    { "name": "name", "type": "string" },
+                    { "name": "version", "type": "string" },
+                    { "name": "chainId", "type": "uint256" },
+                    { "name": "verifyingContract", "type": "address" }
+                  ],
+                  "Message": [{ "name": "content", "type": "string" }]
+                }
+              },
+              "message": {
+                "type": "object",
+                "description": "The actual message data to sign (structure depends on primaryType)",
+                "additionalProperties": true,
+                "example": {
+                  "content": "Hello, World!"
+                }
+              }
+            },
+            "required": ["domain", "primaryType", "types", "message"]
+          }
+        },
+        "required": ["type", "message"]
+      },
       "WalletRPCRequest": {
         "type": "object",
         "description": "Wallet RPC request for performing various blockchain operations including transfers and contract calls",
@@ -9716,6 +9806,9 @@
               },
               {
                 "$ref": "#/components/schemas/ERC20Payload"
+              },
+              {
+                "$ref": "#/components/schemas/SignEIP712Payload"
               }
             ],
             "description": "Payload data that varies based on the action type"
@@ -10230,10 +10323,6 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
-      },
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "basic"
       }
     }
   }
