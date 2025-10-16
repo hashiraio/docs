@@ -66,7 +66,7 @@
         "security": [],
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -132,7 +132,7 @@
         "security": [],
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -198,7 +198,7 @@
         "security": [],
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -269,7 +269,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -340,7 +340,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -411,7 +411,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -500,7 +500,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -562,7 +562,7 @@
         "parameters": [],
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -694,7 +694,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -754,7 +754,7 @@
         "parameters": [],
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -855,7 +855,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -1050,7 +1050,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi.com"
+            "url": "https://catalog-be.staging.btcfi.wtf.com"
           }
         ]
       }
@@ -1121,7 +1121,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -1210,7 +1210,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -1311,7 +1311,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -1402,7 +1402,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi.com"
+            "url": "https://catalog-be.staging.btcfi.wtf.com"
           }
         ]
       }
@@ -1475,7 +1475,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -1588,7 +1588,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -1657,7 +1657,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -1669,7 +1669,7 @@
         "tags": ["Wallets"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -1718,7 +1718,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -1730,7 +1730,7 @@
         "tags": ["Wallets"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -1779,7 +1779,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -1787,11 +1787,11 @@
     "/v1/wallets/{walletId}/rpc": {
       "post": {
         "summary": "Wallet RPC Operations",
-        "description": "Performs comprehensive RPC operations on a wallet including native token transfers and ERC-20 contract interactions. Supports Send operations for native token transfers and Call operations for ERC-20 contract methods on both EVM (Ethereum Sepolia) and Starknet networks. View methods return both hex and parsed data, while state-changing methods return transaction IDs.",
+        "description": "Performs comprehensive RPC operations on a wallet including native token transfers and ERC-20 contract interactions. Supports Send operations for native token transfers and Call operations for ERC-20 contract methods on both EVM (Ethereum Sepolia) and Starknet networks. View methods return both hex and parsed data, while state-changing methods return transaction IDs. Sign method is only used for EVM EIP-712 typed data signing",
         "tags": ["Wallets"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -1814,6 +1814,39 @@
                 "$ref": "#/components/schemas/WalletRPCRequest"
               },
               "examples": {
+                "sign_typed_data": {
+                  "summary": "Sign EIP-712 typed data (EVM)",
+                  "description": "Get the signed EIP-712 data from the EVM wallet",
+                  "value": {
+                    "chain_type": "EVM",
+                    "chain_id": "11155111",
+                    "type": "Sign",
+                    "data": {
+                      "type": "EIP-712",
+                      "message": {
+                        "domain": {
+                          "name": "Test",
+                          "version": "1",
+                          "chainId": "0x7a69",
+                          "verifyingContract": "0x0000000000000000000000000000000000000000"
+                        },
+                        "primaryType": "Message",
+                        "types": {
+                          "EIP712Domain": [
+                            { "name": "name", "type": "string" },
+                            { "name": "version", "type": "string" },
+                            { "name": "chainId", "type": "uint256" },
+                            { "name": "verifyingContract", "type": "address" }
+                          ],
+                          "Message": [{ "name": "content", "type": "string" }]
+                        },
+                        "message": {
+                          "content": "Hello, World!"
+                        }
+                      }
+                    }
+                  }
+                },
                 "send_evm_native": {
                   "summary": "Send Native ETH (EVM)",
                   "description": "Transfer native ETH on Ethereum Sepolia testnet",
@@ -2050,7 +2083,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -2121,7 +2154,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -2210,7 +2243,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -2291,7 +2324,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -2390,7 +2423,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -2469,7 +2502,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -2481,7 +2514,7 @@
         "tags": ["Policies"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -2550,7 +2583,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -2562,7 +2595,7 @@
         "tags": ["Policies"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -2623,7 +2656,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -2633,7 +2666,7 @@
         "tags": ["Policies"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -2724,7 +2757,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -2734,7 +2767,7 @@
         "tags": ["Policies"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -2805,7 +2838,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -2817,7 +2850,7 @@
         "tags": ["Policy Rules"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -2908,7 +2941,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -2920,7 +2953,7 @@
         "tags": ["Policy Rules"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -2991,7 +3024,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -3001,7 +3034,7 @@
         "tags": ["Policy Rules"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -3102,7 +3135,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -3112,7 +3145,7 @@
         "tags": ["Policy Rules"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -3193,7 +3226,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -3205,7 +3238,7 @@
         "tags": ["Apps"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -3279,7 +3312,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -3289,7 +3322,7 @@
         "tags": ["Apps"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -3386,7 +3419,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -3396,7 +3429,7 @@
         "tags": ["Apps"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -3494,7 +3527,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -3506,7 +3539,7 @@
         "tags": ["Apps"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -3598,7 +3631,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -3608,7 +3641,7 @@
         "tags": ["Apps"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -3705,7 +3738,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -3715,7 +3748,7 @@
         "tags": ["Apps"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -3813,7 +3846,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -3906,7 +3939,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -4023,7 +4056,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -4116,7 +4149,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -4233,7 +4266,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -4326,7 +4359,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -4445,7 +4478,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -4560,7 +4593,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -4677,7 +4710,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -4689,7 +4722,7 @@
         "tags": ["Users"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -4783,7 +4816,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -4793,7 +4826,7 @@
         "tags": ["Users"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -4900,7 +4933,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -4912,7 +4945,7 @@
         "tags": ["Users"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -4983,7 +5016,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       },
@@ -4993,7 +5026,7 @@
         "tags": ["Users"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -5070,7 +5103,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -5082,7 +5115,7 @@
         "tags": ["Users"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -5201,7 +5234,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -5213,7 +5246,7 @@
         "tags": ["Users"],
         "security": [
           {
-            "BasicAuth": []
+            "BearerAuth": []
           }
         ],
         "parameters": [
@@ -5355,7 +5388,7 @@
         },
         "servers": [
           {
-            "url": "https://api.catalog.fi"
+            "url": "https://catalog-be.staging.btcfi.wtf"
           }
         ]
       }
@@ -9586,8 +9619,8 @@
       },
       "ActionType": {
         "type": "string",
-        "description": "Type of wallet action to perform",
-        "enum": ["Send", "Call"],
+        "description": "Type of wallet action to perform. (EVM Sign only works for EIP-712 typed data)",
+        "enum": ["Send", "Call", "Sign"],
         "example": "Send"
       },
       "Payload": {
@@ -9658,6 +9691,96 @@
         },
         "required": ["type", "address", "method", "params"]
       },
+      "SignEIP712Payload": {
+        "type": "object",
+        "description": "Payload data for EIP-712 typed data signing in EVM",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Signing method type",
+            "enum": ["EIP-712"],
+            "example": "EIP-712"
+          },
+          "message": {
+            "type": "object",
+            "description": "EIP-712 typed structured data to sign",
+            "properties": {
+              "domain": {
+                "type": "object",
+                "description": "Domain separator parameters for EIP-712",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "User-readable name of signing domain",
+                    "example": "Test"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "Current version of signing domain",
+                    "example": "1"
+                  },
+                  "chainId": {
+                    "type": "string",
+                    "description": "EIP-155 chain id as hex string",
+                    "example": "0x7a69"
+                  },
+                  "verifyingContract": {
+                    "type": "string",
+                    "description": "Address of the contract that will verify the signature",
+                    "example": "0x0000000000000000000000000000000000000000"
+                  }
+                },
+                "required": ["name", "version", "chainId", "verifyingContract"]
+              },
+              "primaryType": {
+                "type": "string",
+                "description": "Primary type of the message being signed",
+                "example": "Message"
+              },
+              "types": {
+                "type": "object",
+                "description": "Type definitions for the structured data",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Field name"
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "Solidity type"
+                      }
+                    },
+                    "required": ["name", "type"]
+                  }
+                },
+                "example": {
+                  "EIP712Domain": [
+                    { "name": "name", "type": "string" },
+                    { "name": "version", "type": "string" },
+                    { "name": "chainId", "type": "uint256" },
+                    { "name": "verifyingContract", "type": "address" }
+                  ],
+                  "Message": [{ "name": "content", "type": "string" }]
+                }
+              },
+              "message": {
+                "type": "object",
+                "description": "The actual message data to sign (structure depends on primaryType)",
+                "additionalProperties": true,
+                "example": {
+                  "content": "Hello, World!"
+                }
+              }
+            },
+            "required": ["domain", "primaryType", "types", "message"]
+          }
+        },
+        "required": ["type", "message"]
+      },
       "WalletRPCRequest": {
         "type": "object",
         "description": "Wallet RPC request for performing various blockchain operations including transfers and contract calls",
@@ -9683,6 +9806,9 @@
               },
               {
                 "$ref": "#/components/schemas/ERC20Payload"
+              },
+              {
+                "$ref": "#/components/schemas/SignEIP712Payload"
               }
             ],
             "description": "Payload data that varies based on the action type"
@@ -10017,6 +10143,9 @@
               },
               {
                 "$ref": "#/components/schemas/StarknetViewCallResult"
+              },
+              {
+                "$ref": "#/components/schemas/SignCallResult"
               }
             ],
             "description": "Result data that varies based on the operation type"
@@ -10092,6 +10221,24 @@
           }
         },
         "required": ["StarknetViewCall"]
+      },
+      "SignCallResult": {
+        "type": "object",
+        "description": "Result for sign calls that return signature data",
+        "properties": {
+          "Sign": {
+            "type": "object",
+            "properties": {
+              "signature": {
+                "type": "string",
+                "description": "Hex signature of the signed data",
+                "example": "0xa8db922019f53b5b28e183127e0612bc738b47d439587417ec1219337e6db27f12dd32f721475d9c81d18f4fb1357de96d99324e92c62750234c0287c4ed41f11c"
+              }
+            },
+            "required": ["signature"]
+          }
+        },
+        "required": ["Sign"]
       },
       "WalletRPCRateLimitResponse": {
         "type": "object",
@@ -10176,10 +10323,6 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
-      },
-      "BasicAuth": {
-        "type": "http",
-        "scheme": "basic"
       }
     }
   }
