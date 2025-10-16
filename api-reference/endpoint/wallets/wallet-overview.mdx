@@ -1,0 +1,1324 @@
+---
+title: "Overview"
+description: "Get blockchain wallets, for 5 chains including Bitcoin, EVM, Starknet, Sui and Solana without having to worry about your private keys"
+---
+
+# Wallet Management
+
+Catalog API provides comprehensive endpoints for creating and interacting with all main blockchain wallets which inculdes sending crypto across the following chains including Bitcoin, EVM, Solana, Starknet and SUI.
+
+## Quick Start - Wallet Management
+
+<Steps>
+  <Step title="Create Wallets">
+    As soon as you sign-up to any of our products that are managed via catalog,
+    all the wallets across the 5 chains are automatically created on your
+    behalf.
+  </Step>
+  <Step title="Get Wallet Details">
+    We provide a comprehensive set of endpoints for all your needs, be it
+    getting your balances, transactions or sending transactions
+  </Step>
+  <Step title="Execute Transactions">
+    Our API endpoints provide you with robust endpoints to execute the
+    transactions to transfer crypto to any chain you'd like provided they are
+    amoung the 5 we support
+  </Step>
+</Steps>
+
+## Wallet Endpoints Overview
+
+### Core Wallet Management
+
+- **Create Wallets** - Create wallets for all 5 supported chains (Bitcoin, Ethereum, Solana, Starknet, Sui) for a user
+- **Get Wallet** - Retrieve detailed information about a specific wallet by ID
+- **Update Wallet** - Update wallet configuration (currently placeholder for future implementation)
+- **Get Wallets** - List all wallets with filtering by account_id, app_id, or owner_id
+
+### Wallet Operations
+
+- **Get Wallet Balance** - Retrieve current balance for specific wallet across different chains
+- **Get Wallet Transactions** - View transaction history with pagination (limit/offset)
+- **Wallet RPC Operations** - Execute send transactions and comprehensive ERC-20 contract calls with full smart contract interaction capabilities
+
+### Supported Blockchains
+
+- **Bitcoin** - Full Bitcoin wallet operations with confirmed/unconfirmed balance tracking
+- **Ethereum** - Complete EVM wallet operations including native ETH transfers and comprehensive ERC-20 smart contract interactions (Sepolia testnet)
+- **Solana** - Native SOL transfer wallet operations
+- **Starknet** - Full Starknet wallet operations with comprehensive ERC-20 contract calls and token ID support
+- **Sui** - Sui blockchain wallet operations with optional token ID support for transfers
+
+### Chain-Specific Details (Testnet)
+
+| Chain    | Balance Unit | Chain ID                                        | Special Requirements                  |
+| -------- | ------------ | ----------------------------------------------- | ------------------------------------- |
+| Bitcoin  | SAT          | testnet                                         | Tracks confirmed/unconfirmed balances |
+| Ethereum | WEI          | 11155111                                        | Standard EVM operations               |
+| Solana   | LAMPORT      | devnet                                          | Standard Solana operations            |
+| Starknet | FELT         | 21280703052830640944970871415780893550344133951 | Requires token_id for transactions    |
+| Sui      | MIST         | testnet                                         | Optional token_id for transactions    |
+
+### Chain-Specific Details (Mainnet)
+
+| Chain    | Balance Unit | Chain ID                                         | Special Requirements                  |
+| -------- | ------------ | ------------------------------------------------ | ------------------------------------- |
+| Bitcoin  | SAT          | mainnet                                          | Tracks confirmed/unconfirmed balances |
+| Ethereum | WEI          | 1                                                | Standard EVM operations               |
+| Solana   | LAMPORT      | mainnet-beta                                     | Standard Solana operations            |
+| Starknet | FELT         | 879618411357393635146340312313736732060953630524 | Requires token_id for transactions    |
+| Sui      | MIST         | mainnet                                          | Optional token_id for transactions    |
+
+## ERC-20 Smart Contract Support
+
+Catalog API provides comprehensive ERC-20 contract interaction capabilities across EVM-compatible chains (Ethereum) and Starknet. Our implementation supports both read-only view calls and state-changing transactions.
+
+### Supported Chains for ERC-20 Operations
+
+- **Ethereum (EVM)** - Full ERC-20 standard support on Sepolia testnet (Chain ID: 11155111) and Mainnet (Chain ID: 1)
+- **Starknet** - ERC-20 contract calls with Cairo contracts on testnet and mainnet
+
+### ERC-20 Method Classifications
+
+#### View Methods (Read-Only)
+
+These methods query contract state without modifying it and return data in both hex and parsed formats:
+
+| Method        | Description                              | Return Type | Example Use Case                    |
+| ------------- | ---------------------------------------- | ----------- | ----------------------------------- |
+| `balanceOf`   | Get token balance for an address         | uint256     | Check user's token balance          |
+| `totalSupply` | Get total token supply                   | uint256     | Display total tokens in circulation |
+| `name`        | Get token name                           | string      | Display token name in UI            |
+| `symbol`      | Get token symbol                         | string      | Display token ticker (e.g., "USDC") |
+| `decimals`    | Get number of decimal places             | uint8       | Format token amounts correctly      |
+| `allowance`   | Get spending allowance between addresses | uint256     | Check approved spending limits      |
+
+#### State-Changing Methods (Transactions)
+
+These methods modify contract state and return transaction IDs:
+
+| Method               | Description                                  | Parameters             | Gas Required   | Example Use Case            |
+| -------------------- | -------------------------------------------- | ---------------------- | -------------- | --------------------------- |
+| `transfer`           | Transfer tokens to another address           | `to`, `amount`         | ~21,000-65,000 | Send tokens to user         |
+| `approve`            | Approve another address to spend tokens      | `spender`, `amount`    | ~46,000        | Enable DEX trading          |
+| `transferFrom`       | Transfer tokens on behalf of another address | `from`, `to`, `amount` | ~23,000-70,000 | Execute approved transfer   |
+| `increaseAllowance`  | Increase spending allowance (EVM)            | `spender`, `amount`    | ~46,000        | Safely increase allowance   |
+| `decreaseAllowance`  | Decrease spending allowance (EVM)            | `spender`, `amount`    | ~46,000        | Safely decrease allowance   |
+| `increase_allowance` | Increase allowance (Starknet)                | `spender`, `amount`    | ~46,000        | Starknet allowance increase |
+| `decrease_allowance` | Decrease allowance (Starknet)                | `spender`, `amount`    | ~46,000        | Starknet allowance decrease |
+
+### ERC-20 Contract Call Request Structure
+
+The ERC-20 contract calls use the same `/wallets/{walletId}/rpc` endpoint with a specific structure:
+
+```json
+{
+  "chain_type": "EVM" | "STARKNET",
+  "chain_id": "11155111", // Sepolia testnet
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0x...", // Contract address
+    "method": "methodName",
+    "params": ["param1", "param2", ...]
+  }
+}
+```
+
+### Response Formats
+
+#### EVM View Call Response (Read-Only)
+
+For EVM view methods, the response includes both raw hex data and parsed human-readable values:
+
+```json
+{
+  "success": true,
+  "result": {
+    "ViewCall": {
+      "hex": "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000",
+      "parsed": {
+        "type": "uint256",
+        "value": "1000000000000000000"
+      }
+    }
+  }
+}
+```
+
+#### Starknet View Call Response (Read-Only)
+
+For Starknet view methods, the response includes direct data without hex parsing:
+
+```json
+{
+  "success": true,
+  "result": {
+    "StarknetViewCall": {
+      "data": "9986730879959026111"
+    }
+  }
+}
+```
+
+#### Transaction Response (State-Changing)
+
+For state-changing methods on both EVM and Starknet, the response includes the transaction ID:
+
+```json
+{
+  "success": true,
+  "result": {
+    "Transaction": {
+      "tx_id": "0xfb0ce3ffcec33fcff58e53af43aa8d54ba49469d629df9954826c091bfdfddad"
+    }
+  }
+}
+```
+
+## Available Endpoints
+
+| Method | Endpoint                           | Description                   | Parameters                                             |
+| ------ | ---------------------------------- | ----------------------------- | ------------------------------------------------------ |
+| `GET`  | `/wallets`                         | Get wallets with filters      | `account_id`, `app_id`, `owner_id` (query params)      |
+| `POST` | `/wallets`                         | Create wallets for all chains | `chain_type`, `app_id`, `owner_id` (body)              |
+| `GET`  | `/wallets/{walletId}`              | Get wallet by ID              | `walletId` (path)                                      |
+| `GET`  | `/wallets/{walletId}/balance`      | Get wallet balance            | `walletId` (path)                                      |
+| `GET`  | `/wallets/{walletId}/transactions` | Get wallet transactions       | `walletId` (path), `limit`, `offset` (query params)    |
+| `POST` | `/wallets/{walletId}/rpc`          | Execute wallet RPC operations | `walletId` (path), `chain_type`, `type`, `data` (body) |
+
+## Authentication
+
+All wallet endpoints use JWT Bearer token authentication. The authentication is handled by the `auth_guard` middleware which validates the JWT token from the `Authorization` header and makes sure you're the owner of the wallet you're trying to execute transactions for.
+
+- **JWT Bearer Token** - Required for all wallet operations
+- **App User Context** - User and app information is extracted from the JWT token
+
+## Common Headers
+
+| Header          | Type   | Required | Description      |
+| --------------- | ------ | -------- | ---------------- |
+| `Authorization` | string | Yes      | Bearer JWT token |
+| `Content-Type`  | string | Yes      | application/json |
+
+## Response Formats
+
+### Create Wallets Response
+
+The `POST /wallets` endpoint returns no response body (HTTP 200 with empty body) as it creates wallets for all 5 chains in the background.
+
+### GET /wallet Response
+
+```json
+[
+  {
+    "id": "76f3f233-9a99-486e-bab2-dc0518ba3dac",
+    "address": "tb1pvr68mmpfew4r48xrl8d4txkjmj73qejj8m7r49e5fpsrl8zpf5uqywmgrh",
+    "chain_type": "BITCOIN",
+    "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+    "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+    "policy_ids": [],
+    "created_at": 1757931209
+  },
+  {
+    "id": "a884dbf4-8ee5-40ab-97e3-78daa9dfa66c",
+    "address": "0x3e17f24a1dddf32084520e165b426448741d4fb2",
+    "chain_type": "ETHEREUM",
+    "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+    "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+    "policy_ids": [],
+    "created_at": 1757931209
+  },
+  {
+    "id": "5e5049a0-a192-4153-adc7-1e039d6ed8e4",
+    "address": "3gpYs9qsugXnvikxRAWiqZMFifUPbxAVk7SbA543tB4y",
+    "chain_type": "SOLANA",
+    "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+    "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+    "policy_ids": [],
+    "created_at": 1757931209
+  },
+  {
+    "id": "e7d1067c-2641-484c-ab72-c3b134c7e21c",
+    "address": "0x287eab862f8fda704a760485da302dc0ee38fbb864969d37041aa9131337464",
+    "chain_type": "STARKNET",
+    "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+    "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+    "policy_ids": [],
+    "created_at": 1757931209
+  },
+  {
+    "id": "7676adbf-6b00-4f84-b143-67b18d644ac3",
+    "address": "0x756fce35d5b9ee5ad3df75c0c784c273bc6e1cd8c422ac07aec67b2daed1c201",
+    "chain_type": "SUI",
+    "app_id": "4dba5ccb-5336-42d4-b43a-04b79a2192af",
+    "owner_id": "188a45d3-0e92-403d-b377-d116ee59fddf",
+    "policy_ids": [],
+    "created_at": 1757931209
+  }
+]
+```
+
+### Wallet Balance Response
+
+```json
+{
+  "chain": "EVM",
+  "chain_id": "11155111",
+  "address": "0x34e50a179c9e497c43b14275413425c80253edd2",
+  "balance": "4899597513893689",
+  "unit": "WEI",
+  "unconfirmed_balance": null
+}
+```
+
+### Get Transactions Response
+
+```json
+{
+  "erc_20": [
+    {
+      "id": "aaaae5e0-56d4-42b9-8b93-95c9a9bca420",
+      "wallet_id": "fa6ee90b-8ad9-43a6-801c-652bd3df4ca0",
+      "chain_type": "EVM",
+      "chain_id": "11155111",
+      "network": "Testnet",
+      "contract_address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+      "method": "approve",
+      "params": ["0xcA2b82Da750267D7631173105f61708206E290b5", "1000"],
+      "tx_id": "0x68d7ff1c5ec2bc2f34114ed0229776442b27ba2e24cb410034a8ad9679d6b894",
+      "created_at": 1758607015
+    },
+    {
+      "id": "e0f790cc-838d-4037-9843-89d888ebf461",
+      "wallet_id": "fa6ee90b-8ad9-43a6-801c-652bd3df4ca0",
+      "chain_type": "STARKNET",
+      "chain_id": "18015005652912004684",
+      "network": "Testnet",
+      "contract_address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+      "method": "approve",
+      "params": [
+        "0x0437b14f4ab3d975f97c771912c44e5b1b1d67b6a5d1718f5d09a6c085f8c977",
+        "1000"
+      ],
+      "tx_id": "0x240a3e994a14cfaf501eba83bd0f9bb6c12bfd43672a3b89292685dea0cee48",
+      "created_at": 1758607251
+    }
+  ],
+  "wallet": [
+    {
+      "id": "382ffda9-09a2-4e45-9a10-d51391a271e6",
+      "wallet_id": "fa6ee90b-8ad9-43a6-801c-652bd3df4ca0",
+      "network": "Testnet",
+      "recipient": "0xc2301b62ff12DfBC708894B1d20FAfE31Cc6Cb0a",
+      "amount": "100000000000000",
+      "chain_type": "EVM",
+      "chain_id": "11155111",
+      "tx_id": "0xabbc7f6f29d6256037a2c74fc9c4241ce17050d75a507ea62ea1cf969d590351",
+      "created_at": 1758608883
+    },
+    {
+      "id": "b746956e-ce74-462b-b00a-ccb26b89760a",
+      "wallet_id": "fa6ee90b-8ad9-43a6-801c-652bd3df4ca0",
+      "network": "Testnet",
+      "recipient": "0xc2301b62ff12DfBC708894B1d20FAfE31Cc6Cb0a",
+      "amount": "100000000000000",
+      "chain_type": "EVM",
+      "chain_id": "11155111",
+      "tx_id": "0xbab5c9c3de212b20a8185c40c0786c592bbed85ffc2d51afdc55cd3ed9ff9d14",
+      "created_at": 1758608878
+    }
+  ]
+}
+```
+
+## Wallet RPC Request
+
+### Send Transaction
+
+```json
+{
+  "chain_type": "ETHEREUM",
+  "type": "Send",
+  "data": {
+    "reciever": "0x1ed419492279cf08b558326c2e66eae03be20d47",
+    "amount": "100000000000000"
+  }
+}
+```
+
+### Wallet RPC Response
+
+```json
+{
+  "success": true,
+  "tx_id": "0x27690927920e59ee062806e85a0766f60ffbabe5b82e2c00a0b7a59d3482f3c6"
+}
+```
+
+### ERC-20 Contract Call Examples
+
+Based on our tested methods, here are comprehensive examples for each supported ERC-20 operation:
+
+#### EVM (Ethereum) Examples
+
+##### Example 1: Check Token Balance (View Call)
+
+**Request:**
+
+```json
+{
+  "chain_type": "EVM",
+  "chain_id": "11155111",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+    "method": "balanceOf",
+    "params": ["0xc2301b62ff12DfBC708894B1d20FAfE31Cc6Cb0a"]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "ViewCall": {
+      "hex": "0x00000000000000000000000000000000000000000000000000000000000186a1",
+      "parsed": "100001"
+    }
+  }
+}
+```
+
+##### Example 2: Get Token Symbol (View Call)
+
+**Request:**
+
+```json
+{
+  "chain_type": "EVM",
+  "chain_id": "11155111",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+    "method": "symbol",
+    "params": []
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "ViewCall": {
+      "hex": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000045742544300000000000000000000000000000000000000000000000000000000",
+      "parsed": "WBTC"
+    }
+  }
+}
+```
+
+##### Example 3: Get Token Decimals (View Call)
+
+**Request:**
+
+```json
+{
+  "chain_type": "EVM",
+  "chain_id": "11155111",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+    "method": "decimals",
+    "params": []
+  }
+}
+```
+
+**Response**
+
+```json
+{
+  "success": true,
+  "result": {
+    "ViewCall": {
+      "hex": "0x0000000000000000000000000000000000000000000000000000000000000008",
+      "parsed": "8"
+    }
+  }
+}
+```
+
+##### Example 4: Check Allowance (View Call)
+
+**Request:**
+
+```json
+{
+  "chain_type": "EVM",
+  "chain_id": "11155111",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+    "method": "allowance",
+    "params": [
+      "0xc2301b62ff12DfBC708894B1d20FAfE31Cc6Cb0a",
+      "0x34e50a179c9e497c43b14275413425c80253edd2"
+    ]
+  }
+}
+```
+
+**Response**
+
+```json
+{
+  "success": true,
+  "result": {
+    "ViewCall": {
+      "hex": "0x00000000000000000000000000000000000000000000000000000000000003e6",
+      "parsed": "998"
+    }
+  }
+}
+```
+
+##### Example 5: Get Total Supply (View Call)
+
+**Request:**
+
+```json
+{
+  "chain_type": "EVM",
+  "chain_id": "11155111",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+    "method": "totalSupply",
+    "params": []
+  }
+}
+```
+
+**Response**
+
+```json
+{
+  "success": true,
+  "result": {
+    "ViewCall": {
+      "hex": "0x000000000000000000000000000000000000000000000000000775f05a074000",
+      "parsed": "2100000000000000"
+    }
+  }
+}
+```
+
+##### Example 6: Approve Token Spending (Transaction)
+
+**Request:**
+
+```json
+{
+  "chain_type": "EVM",
+  "chain_id": "11155111",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+    "method": "approve",
+    "params": ["0x34e50a179c9e497c43b14275413425c80253edd2", "1000"]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "Transaction": {
+      "tx_id": "0x68d7ff1c5ec2bc2f34114ed0229776442b27ba2e24cb410034a8ad9679d6b894"
+    }
+  }
+}
+```
+
+##### Example 7: Transfer Tokens (Transaction)
+
+**Request:**
+
+```json
+{
+  "chain_type": "EVM",
+  "chain_id": "11155111",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+    "method": "transfer",
+    "params": ["0x34e50a179c9e497c43b14275413425c80253edd2", "1"]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "Transaction": {
+      "tx_id": "0x68d7ff1c5ec2bc2f34114ed0229776442b27ba2e24cb410034a8ad9679d6b894"
+    }
+  }
+}
+```
+
+##### Example 8: TransferFrom (Transaction)
+
+**Request:**
+
+```json
+{
+  "chain_type": "EVM",
+  "chain_id": "11155111",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+    "method": "transferFrom",
+    "params": [
+      "0xc2301b62ff12DfBC708894B1d20FAfE31Cc6Cb0a",
+      "0x34e50a179c9e497c43b14275413425c80253edd2",
+      "1"
+    ]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "Transaction": {
+      "tx_id": "0x68d7ff1c5ec2bc2f34114ed0229776442b27ba2e24cb410034a8ad9679d6b894"
+    }
+  }
+}
+```
+
+##### Example 9: Increase Allowance (Transaction)
+
+**Request:**
+
+```json
+{
+  "chain_type": "EVM",
+  "chain_id": "11155111",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+    "method": "increaseAllowance",
+    "params": ["0x34e50a179c9e497c43b14275413425c80253edd2", "9"]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "Transaction": {
+      "tx_id": "0x68d7ff1c5ec2bc2f34114ed0229776442b27ba2e24cb410034a8ad9679d6b894"
+    }
+  }
+}
+```
+
+##### Example 10: Decrease Allowance (Transaction)
+
+**Request:**
+
+```json
+{
+  "chain_type": "EVM",
+  "chain_id": "11155111",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+    "method": "decreaseAllowance",
+    "params": ["0x34e50a179c9e497c43b14275413425c80253edd2", "9"]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "Transaction": {
+      "tx_id": "0x68d7ff1c5ec2bc2f34114ed0229776442b27ba2e24cb410034a8ad9679d6b894"
+    }
+  }
+}
+```
+
+#### Starknet Examples
+
+##### Example 11: Starknet Balance Check (View Call)
+
+**Request:**
+
+```json
+{
+  "chain_type": "STARKNET",
+  "chain_id": "18015005652912004684",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+    "method": "balanceOf",
+    "params": [
+      "0x0148a1989328bde22c510a9f637c44e87817bf2f3e2760b783575789b23bf2df"
+    ]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "StarknetViewCall": {
+      "data": "9986730879959026111"
+    }
+  }
+}
+```
+
+##### Example 12: Starknet Token Name (View Call)
+
+**Request:**
+
+```json
+{
+  "chain_type": "STARKNET",
+  "chain_id": "18015005652912004684",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+    "method": "name",
+    "params": []
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "StarknetViewCall": {
+      "data": "1692660622325569080906667411596654" (HEX)
+    }
+  }
+}
+```
+
+##### Example 13: Starknet Approve (Transaction)
+
+**Request:**
+
+```json
+{
+  "chain_type": "STARKNET",
+  "chain_id": "18015005652912004684",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+    "method": "approve",
+    "params": [
+      "0x30bc78c905609a394b0135e3c2685e8014c812b154cba3a0a571bf7899c5ada",
+      "1000"
+    ]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "Transaction": {
+      "tx_id": "0x240a3e994a14cfaf501eba83bd0f9bb6c12bfd43672a3b89292685dea0cee48"
+    }
+  }
+}
+```
+
+##### Example 14: Starknet Transfer (Transaction)
+
+**Request:**
+
+```json
+{
+  "chain_type": "STARKNET",
+  "chain_id": "18015005652912004684",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+    "method": "transfer",
+    "params": [
+      "0x30bc78c905609a394b0135e3c2685e8014c812b154cba3a0a571bf7899c5ada",
+      "1"
+    ]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "Transaction": {
+      "tx_id": "0x240a3e994a14cfaf501eba83bd0f9bb6c12bfd43672a3b89292685dea0cee48"
+    }
+  }
+}
+```
+
+##### Example 15: Starknet Increase Allowance (Transaction)
+
+**Request:**
+
+```json
+{
+  "chain_type": "STARKNET",
+  "chain_id": "18015005652912004684",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+    "method": "increaseAllowance",
+    "params": [
+      "0x30bc78c905609a394b0135e3c2685e8014c812b154cba3a0a571bf7899c5ada",
+      "100"
+    ]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "Transaction": {
+      "tx_id": "0x240a3e994a14cfaf501eba83bd0f9bb6c12bfd43672a3b89292685dea0cee48"
+    }
+  }
+}
+```
+
+##### Example 16: Starknet Decrease Allowance (Transaction)
+
+**Request:**
+
+```json
+{
+  "chain_type": "STARKNET",
+  "chain_id": "18015005652912004684",
+  "type": "Call",
+  "data": {
+    "type": "ERC20",
+    "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+    "method": "decreaseAllowance",
+    "params": [
+      "0x30bc78c905609a394b0135e3c2685e8014c812b154cba3a0a571bf7899c5ada",
+      "10"
+    ]
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "result": {
+    "Transaction": {
+      "tx_id": "0x240a3e994a14cfaf501eba83bd0f9bb6c12bfd43672a3b89292685dea0cee48"
+    }
+  }
+}
+```
+
+## Error Handling
+
+Wallet endpoints use standard HTTP status codes and return detailed error messages:
+
+### HTTP Status Codes
+
+- **200** - Success
+- **400** - Bad Request (invalid parameters, insufficient balance, invalid amount)
+- **401** - Unauthorized (invalid JWT token)
+- **403** - Forbidden (insufficient permissions)
+- **404** - Wallet not found
+- **500** - Internal Server Error (wallet creation/loading failed, balance retrieval failed)
+
+### Wallet-Specific Errors
+
+| Error Type               | HTTP Status | Description                                        |
+| ------------------------ | ----------- | -------------------------------------------------- |
+| `WalletNotFound`         | 404         | The requested wallet does not exist                |
+| `InsufficientBalance`    | 400         | Not enough balance for the transaction             |
+| `InvalidAddress`         | 400         | The provided wallet address is invalid             |
+| `InvalidAmount`          | 400         | The provided amount format is invalid              |
+| `UnsupportedChainType`   | 400         | The chain type is not supported                    |
+| `TokenIdRequired`        | 400         | Token ID is required for Starknet/Sui transactions |
+| `WalletCreationFailed`   | 500         | Failed to create the wallet                        |
+| `WalletLoadFailed`       | 500         | Failed to load the wallet                          |
+| `TransactionFailed`      | 400         | Transaction execution failed                       |
+| `BalanceRetrievalFailed` | 500         | Failed to retrieve wallet balance                  |
+| `TransactionSaveFailed`  | 500         | Failed to save transaction to database             |
+
+## Best Practices
+
+### Wallet Security
+
+- **Secure Storage** - Store wallet credentials securely
+- **Access Control** - Implement proper access controls for wallet operations
+- **Audit Logging** - Log all wallet operations for security monitoring
+- **Backup Strategy** - Regularly backup wallet data
+
+### Transaction Management
+
+- **Gas Estimation** - Always estimate gas before sending transactions
+- **Nonce Management** - Handle transaction nonces properly
+- **Error Handling** - Implement robust error handling for failed transactions
+- **Confirmation Monitoring** - Monitor transaction confirmations
+
+### ERC-20 Contract Interactions
+
+- **Contract Verification** - Always verify contract addresses before interacting
+- **View vs Transaction** - Use view calls for read-only data to save gas costs
+- **Amount Formatting** - Ensure proper decimal handling for token amounts
+- **Allowance Management** - Check allowances before transferFrom operations
+- **Gas Estimation** - Monitor gas costs for contract interactions
+- **Response Parsing** - Handle both hex and parsed response formats appropriately
+- **Error Handling** - Implement specific error handling for contract failures
+- **Token Standards** - Verify ERC-20 compliance before integration
+- **Network Compatibility** - Ensure contract deployment on target network (testnet/mainnet)
+- **Parameter Validation** - Validate all parameters before contract calls
+
+## Complete Example
+
+Here's a complete example of wallet management using the actual API:
+
+```javascript
+// Create wallets for all chains
+const createWallets = async (accessToken) => {
+  const response = await fetch(`https://api.catalog.fi/v1/wallets`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      app_id: "550e8400-e29b-41d4-a716-446655440001",
+      owner_id: "550e8400-e29b-41d4-a716-446655440002",
+    }),
+  });
+  // No response body - just check if successful
+  return response.ok;
+};
+
+// Get wallet details
+const getWallet = async (walletId, accessToken) => {
+  const response = await fetch(
+    `https://api.catalog.fi/v1/wallets/${walletId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.json();
+};
+
+// Get wallets with filters
+const getWallets = async (filters, accessToken) => {
+  const queryParams = new URLSearchParams();
+  if (filters.account_id) queryParams.append("account_id", filters.account_id);
+  if (filters.app_id) queryParams.append("app_id", filters.app_id);
+  if (filters.owner_id) queryParams.append("owner_id", filters.owner_id);
+
+  const response = await fetch(
+    `https://api.catalog.fi/v1/wallets?${queryParams}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.json();
+};
+
+// Get wallet balance
+const getWalletBalance = async (walletId, accessToken) => {
+  const response = await fetch(
+    `https://api.catalog.fi/v1/wallets/${walletId}/balance`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.json();
+};
+
+// Get wallet transactions
+const getWalletTransactions = async (walletId, params, accessToken) => {
+  const queryParams = new URLSearchParams();
+  if (params.limit) queryParams.append("limit", params.limit);
+  if (params.offset) queryParams.append("offset", params.offset);
+
+  const response = await fetch(
+    `https://api.catalog.fi/v1/wallets/${walletId}/transactions?${queryParams}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.json();
+};
+
+// Execute a transaction (Send)
+const sendTransaction = async (walletId, transactionData, accessToken) => {
+  const response = await fetch(
+    `https://api.catalog.fi/v1/wallets/${walletId}/rpc`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chain_type: "ETHEREUM",
+        type: "Send",
+        data: {
+          reciever: transactionData.recipient,
+          amount: transactionData.amount,
+          token_id: transactionData.token_id, // Optional for Sui (Required for Starknet)
+        },
+      }),
+    }
+  );
+  return response.json();
+};
+
+// Execute ERC-20 contract calls
+const executeERC20Call = async (walletId, contractData, accessToken) => {
+  const response = await fetch(
+    `https://api.catalog.fi/v1/wallets/${walletId}/rpc`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chain_type: contractData.chainType,
+        chain_id: contractData.chainId,
+        type: "Call",
+        data: {
+          type: "ERC20",
+          address: contractData.contractAddress,
+          method: contractData.method,
+          params: contractData.params,
+        },
+      }),
+    }
+  );
+  return response.json();
+};
+
+// Example: Check token balance (EVM)
+const checkTokenBalance = async (walletId, accessToken) => {
+  return executeERC20Call(
+    walletId,
+    {
+      chainType: "EVM",
+      chainId: "11155111", // Sepolia
+      contractAddress: "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+      method: "balanceOf",
+      params: ["0xc2301b62ff12DfBC708894B1d20FAfE31Cc6Cb0a"],
+    },
+    accessToken
+  );
+};
+
+// Example: Approve token spending (EVM)
+const approveToken = async (walletId, spenderAddress, amount, accessToken) => {
+  return executeERC20Call(
+    walletId,
+    {
+      chainType: "EVM",
+      chainId: "11155111", // Sepolia
+      contractAddress: "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+      method: "approve",
+      params: [spenderAddress, amount],
+    },
+    accessToken
+  );
+};
+
+// Example: Transfer tokens (EVM)
+const transferTokens = async (
+  walletId,
+  recipientAddress,
+  amount,
+  accessToken
+) => {
+  return executeERC20Call(
+    walletId,
+    {
+      chainType: "EVM",
+      chainId: "11155111", // Sepolia
+      contractAddress: "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+      method: "transfer",
+      params: [recipientAddress, amount],
+    },
+    accessToken
+  );
+};
+
+// Example: TransferFrom (EVM)
+const transferFromTokens = async (
+  walletId,
+  fromAddress,
+  toAddress,
+  amount,
+  accessToken
+) => {
+  return executeERC20Call(
+    walletId,
+    {
+      chainType: "EVM",
+      chainId: "11155111", // Sepolia
+      contractAddress: "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+      method: "transferFrom",
+      params: [fromAddress, toAddress, amount],
+    },
+    accessToken
+  );
+};
+
+// Example: Increase allowance (EVM)
+const increaseAllowance = async (
+  walletId,
+  spenderAddress,
+  amount,
+  accessToken
+) => {
+  return executeERC20Call(
+    walletId,
+    {
+      chainType: "EVM",
+      chainId: "11155111", // Sepolia
+      contractAddress: "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+      method: "increaseAllowance",
+      params: [spenderAddress, amount],
+    },
+    accessToken
+  );
+};
+
+// Example: Decrease allowance (EVM)
+const decreaseAllowance = async (
+  walletId,
+  spenderAddress,
+  amount,
+  accessToken
+) => {
+  return executeERC20Call(
+    walletId,
+    {
+      chainType: "EVM",
+      chainId: "11155111", // Sepolia
+      contractAddress: "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+      method: "decreaseAllowance",
+      params: [spenderAddress, amount],
+    },
+    accessToken
+  );
+};
+
+// Example: Check allowance (EVM)
+const checkAllowance = async (
+  walletId,
+  ownerAddress,
+  spenderAddress,
+  accessToken
+) => {
+  return executeERC20Call(
+    walletId,
+    {
+      chainType: "EVM",
+      chainId: "11155111", // Sepolia
+      contractAddress: "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07",
+      method: "allowance",
+      params: [ownerAddress, spenderAddress],
+    },
+    accessToken
+  );
+};
+
+// Example: Get token information (EVM - tested methods only)
+const getTokenInfo = async (walletId, accessToken) => {
+  const contractAddress = "0xE918A5a47b8e0AFAC2382bC5D1e981613e63fB07";
+
+  // Get tested token properties
+  const [symbol, decimals, totalSupply] = await Promise.all([
+    executeERC20Call(
+      walletId,
+      {
+        chainType: "EVM",
+        chainId: "11155111",
+        contractAddress,
+        method: "symbol",
+        params: [],
+      },
+      accessToken
+    ),
+
+    executeERC20Call(
+      walletId,
+      {
+        chainType: "EVM",
+        chainId: "11155111",
+        contractAddress,
+        method: "decimals",
+        params: [],
+      },
+      accessToken
+    ),
+
+    executeERC20Call(
+      walletId,
+      {
+        chainType: "EVM",
+        chainId: "11155111",
+        contractAddress,
+        method: "totalSupply",
+        params: [],
+      },
+      accessToken
+    ),
+  ]);
+
+  return { symbol, decimals, totalSupply };
+};
+
+// Example: Starknet token operations
+const starknetTokenBalance = async (walletId, accessToken) => {
+  return executeERC20Call(
+    walletId,
+    {
+      chainType: "STARKNET",
+      chainId: "18015005652912004684", // Starknet Sepolia
+      contractAddress:
+        "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+      method: "balanceOf",
+      params: [
+        "0x0148a1989328bde22c510a9f637c44e87817bf2f3e2760b783575789b23bf2df",
+      ],
+    },
+    accessToken
+  );
+};
+
+// Example: Starknet approve
+const starknetApprove = async (
+  walletId,
+  spenderAddress,
+  amount,
+  accessToken
+) => {
+  return executeERC20Call(
+    walletId,
+    {
+      chainType: "STARKNET",
+      chainId: "18015005652912004684",
+      contractAddress:
+        "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+      method: "approve",
+      params: [spenderAddress, amount],
+    },
+    accessToken
+  );
+};
+
+// Example: Starknet transfer
+const starknetTransfer = async (
+  walletId,
+  recipientAddress,
+  amount,
+  accessToken
+) => {
+  return executeERC20Call(
+    walletId,
+    {
+      chainType: "STARKNET",
+      chainId: "18015005652912004684",
+      contractAddress:
+        "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+      method: "transfer",
+      params: [recipientAddress, amount],
+    },
+    accessToken
+  );
+};
+```
